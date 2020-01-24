@@ -1,0 +1,5 @@
+01/24
+* started the project
+* basic structure for backend and frontend directories
+* implemented router
+* created github branches
