@@ -3,3 +3,7 @@
 * basic structure for backend and frontend directories
 * implemented router
 * created github branches
+* need to find a way to easily embed phaserJS canvas in React application
+* found great component by proyecto26 called ion-phaser https://github.com/proyecto26/ion-phaser
+* created game component to wrap the phaserJS canvas
+* https://phaser.discourse.group/t/phaser-3-interaction-with-react/308/10
