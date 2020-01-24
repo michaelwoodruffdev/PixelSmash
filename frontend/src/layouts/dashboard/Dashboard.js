@@ -1,10 +1,11 @@
 import React from 'react';
 import './Dashboard.css';
+import Game from '../../components/game/Game.js';
 
 function Dashboard() {
   return (
     <div className="Dashboard">
-      <h1>This game is poppin</h1>
+      <Game />
     </div>
   );
 }
