@@ -9,8 +9,6 @@ export default class Game extends React.Component {
         super(props);
 
         // this is where I'm thinking we can take props and use them to build the Phaser scene upon starting a new game
-        // of course this would mean having to remount this component on every new game, we should probably instead update 
-        // the state of the phaser game and the currently loaded resources as the players switch between games.
         this.state = {
             unmounted: false,
             initialize: true,
@@ -30,8 +28,8 @@ export default class Game extends React.Component {
                         this.cameras.main.setBackgroundColor('#24252A')
                     },
                     preload: function () {
-
-                    }, 
+                        this.load.image('wario', 'assets/wario.png');
+                    },
                     create: function () {
                         this.helloWorld = this.add.text(
                             this.cameras.main.centerX,
@@ -43,8 +41,15 @@ export default class Game extends React.Component {
                         );
                         this.helloWorld.setOrigin(0.5);
                         this.counter = 0;
+                        this.player = this.physics.add.image(100, 100, 'wario');
+                        this.player.setBounce(.2, .2);
+                        this.player.setCollideWorldBounds(true);
+                        this.physics.world.bounds = new Phaser.Geom.Rectangle(0, 0, 800, 600);
                     },
                     update: function () {
+                        if (this.counter === 0.00) {
+                            console.log(this.player);
+                        }
                         this.counter += .07;
                         this.helloWorld.angle = 0 + (10 * Math.sin(this.counter));
                     }
