@@ -1,0 +1,21 @@
+#form{
+    margin: auto;
+    width: 50%;
+    margin-top: 100px
+}
+#outlined-required{
+    margin: auto;
+    width: 300px;
+}
+#buttons{
+    margin-top: 20px;
+}
+Button{
+    width: 140px;
+}
+#login{
+    margin-right: 20px;
+}
+#signup{
+    margin-left: 20px;
+}

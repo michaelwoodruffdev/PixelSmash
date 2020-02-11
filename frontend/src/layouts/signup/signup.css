@@ -1,0 +1,34 @@
+.card{
+    margin: auto;
+    margin-top: 70px;
+    width: 600px;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+}
+#names{
+    margin-top: 50px;
+    /* display: flex; */
+    width: 500px;
+}
+.name{
+    width: 200px;
+    margin-right: 40px;
+}
+.surname{
+    width: 200px;
+    margin-left: 40px;
+}
+.email{
+    width: 400px
+}
+.password{
+    width: 400px;
+}
+#create{
+    width: 400px;
+    margin-top: 20px;
+}
+form{
+    justify-content: center;
+}
