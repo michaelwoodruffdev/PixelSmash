@@ -8,6 +8,8 @@ export default class Game extends React.Component {
     constructor(props) {
         super(props);
 
+        let { player1Prop } = props;
+
         this.state = {
             unmounted: true,
             initialize: true,
@@ -27,7 +29,7 @@ export default class Game extends React.Component {
                         this.cameras.main.setBackgroundColor('#24252A')
                     },
                     preload: function () {
-                        this.load.spritesheet('player', 'assets/trumpsprite.png', { frameWidth: 100, frameHeight: 100 });
+                        this.load.spritesheet('player1', player1Prop.spritesheetPath, { frameWidth: player1Prop.frameDimensions.x, frameHeight: player1Prop.frameDimensions.y });
                         this.load.image('background', 'assets/background.png');
                         this.load.image('ground', 'assets/ground.png');
                     },
@@ -37,40 +39,42 @@ export default class Game extends React.Component {
                         this.background = this.add.image(600, 337.5, 'background');
 
                         // platforms
-                        this.platforms = this.physics.add.staticGroup();
-                        this.platforms.create(600, 550, 'ground').setScale(.75).refreshBody();
-                        this.platforms.create(350, 400, 'ground').setScale(.2).refreshBody();
-                        this.platforms.create(850, 400, 'ground').setScale(.2).refreshBody();
+                        this.passablePlatforms = this.physics.add.staticGroup();
+                        this.passablePlatforms.create(350, 400, 'ground').setScale(.2).refreshBody();
+                        this.passablePlatforms.create(850, 400, 'ground').setScale(.2).refreshBody();
+                        
+                        this.impassablePlatforms = this.physics.add.staticGroup();
+                        this.impassablePlatforms.create(600, 550, 'ground').setScale(.75).refreshBody();
 
                         // player
-                        this.player = this.physics.add.sprite(600, 400, 'player');
-                        // this.player.setBounce(.2, .2);
-                        // this.player.setCollideWorldBounds(true);
-                        this.player.setMass(200);
-                        this.player.jumpCount = 1;
-                        this.player.isMidair = true;
-                        this.player.setSize(70, 70);
+                        this.player1 = this.physics.add.sprite(600, 400, 'player1');
+                        // this.player1.setBounce(.2, .2);
+                        // this.player1.setCollideWorldBounds(true);
+                        this.player1.setMass(player1Prop.mass);
+                        this.player1.jumpCount = 1;
+                        this.player1.isMidair = true;
+                        this.player1.setSize(player1Prop.hitboxDimensions.x, player1Prop.hitboxDimensions.y);
                         this.anims.create({
                             key: 'left',
-                            frames: this.anims.generateFrameNumbers('player', { start: 18, end: 23 }),
+                            frames: this.anims.generateFrameNumbers('player1', { start: 18, end: 23 }),
                             frameRate: 10,
                             repeat: -1
                         });
                         this.anims.create({
                             key: 'right',
-                            frames: this.anims.generateFrameNumbers('player', { start: 6, end: 11 }),
+                            frames: this.anims.generateFrameNumbers('player1', { start: 6, end: 11 }),
                             frameRate: 10,
                             repeat: -1
                         });
                         this.anims.create({
                             key: 'idle',
-                            frames: this.anims.generateFrameNumbers('player', { start: 4, end: 5 }),
+                            frames: this.anims.generateFrameNumbers('player1', { start: 4, end: 5 }),
                             frameRate: 3,
                             repeat: -1
                         });
                         this.anims.create({
                             key: 'jump',
-                            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 5 }),
+                            frames: this.anims.generateFrameNumbers('player1', { start: 0, end: 5 }),
                             frameRate: 15,
                             repeat: 1
                         });
@@ -88,29 +92,24 @@ export default class Game extends React.Component {
                         this.counter = 0;
 
                         // physics collisions
-                        this.groundCollision = this.physics.add.collider(this.player, this.platforms, () => {
-                            // this.player.jumpCount = 0;
-                            if (this.player.body.onFloor() === true) {
-                                console.log('hello floor');
-                                this.player.setVelocityY(0);
-                                this.player.jumpCount = 0;
-                            }
-                            if (this.player.body.onCeiling() === true) {
-                                // this.player.body.setCollideWor
+                        this.passableCollision = this.physics.add.collider(this.player1, this.passablePlatforms, () => {
+                            if (this.player1.body.onFloor() === true) {
+                                this.player1.jumpCount = 0;
                             }
                         }, 
                         (player, platform) => {
-                            // if (this.player.body.velocity.y < 0) {
-                            //     if (player.y > platform.y)
-                            //     return false;
-                            // }
-                            if (player.y + 20 > platform.y) {
+                            if (player.y + 20 > platform.y || this.player1.body.velocity.y < 0) {
                                 return false;
                             }
                             return true;
                         });
 
-                        // this.groundCollision.overlapOnly = true;
+                        this.impassableCollision = this.physics.add.collider(this.player1, this.impassablePlatforms, () => {
+                            if (this.player1.body.onFloor() === true) {
+                                this.player1.jumpCount = 0;
+                            }
+                        });
+
 
                         // initialize keyboard listeners
                         this.cursors = this.input.keyboard.createCursorKeys();
@@ -118,7 +117,7 @@ export default class Game extends React.Component {
                     },
                     update: function () {
                         if (this.counter === 0.00) {
-                            console.log(this.player);
+                            console.log(this.player1);
                             console.log(this.load);
                         }
 
@@ -129,53 +128,47 @@ export default class Game extends React.Component {
                         }
                         this.helloWorld.angle = 0 + (10 * Math.sin(this.counter));
                         if (this.counter === .1) {
-                            // console.log(this.player.y);
-                            console.log(this.player.body.velocity);
+                            // console.log(this.player1.y);
+                            console.log(this.player1.body.velocity);
                         }
 
                         // input handling
                         if (this.cursors.left.isDown) {
-                            this.player.anims.play('left', true);
-                            this.player.setVelocityX(-250);
+                            this.player1.anims.play('right', true);
+                            this.player1.setVelocityX(-player1Prop.movementSpeed);
                         }
                         else if (this.cursors.right.isDown) {
-                            this.player.anims.play('right', true);
-                            this.player.setVelocityX(250);
+                            this.player1.anims.play('left', true);
+                            this.player1.setVelocityX(player1Prop.movementSpeed);
                         }
                         else {
-                            this.player.anims.play('idle', true);
-                            this.player.setVelocityX(0);
-                        }
-                        // if (this.player.jumpCount < 2 && this.cursors.space.isUp)
-                        if (this.cursors.space.isDown && (this.player.body.touching.down || !this.player.hasDoubleJumped)) {
-                            if (!this.player.body.touching.down) {
-                                this.player.hasDoubleJumped = true;
-                            }
-                            this.player.setVelocityY(-600);
-                        }
-                        if (this.player.y > 850 || this.player.x < -50 || this.player.x > 1250) {
-                            this.player.setVelocityY(0);
-                            this.player.y = 400;
-                            this.player.x = 600;
-                        }
-
-                        if (this.player.body.onFloor() === true) {
-                            this.player.setVelocityY(0);
+                            this.player1.anims.play('idle', true);
+                            this.player1.setVelocityX(0);
                         }
                         this.cursors.space.onDown = (e) => {
-                            if (!this.cursors.space.isPressedWithoutRelease && this.player.jumpCount < 2) {
-                                this.player.jumpCount += 1;
-                                this.player.setVelocityY(-400);
+                            if (!this.cursors.space.isPressedWithoutRelease && this.player1.jumpCount < 2) {
+                                if (this.player1.jumpCount === 0) {
+                                    this.player1.setVelocityY(-450);
+                                }
+                                else if (this.player1.jumpCount === 1) {
+                                    this.player1.setVelocityY(-300);
+                                }
+                                this.player1.jumpCount += 1;
                                 this.cursors.space.isPressedWithoutRelease = true;
                                 console.log('true jump');
                             }
                         }
-                        // if (this.cursors.spaceKeyDown) {
-                        //     this.cursors.spaceKeyTimer += 1;
-                        // }
                         this.cursors.space.onUp = (e) => {
                             this.cursors.space.isPressedWithoutRelease = false;
                         }
+
+                        // boundaries
+                        if (this.player1.y > 850 || this.player1.x < -50 || this.player1.x > 1250) {
+                            this.player1.setVelocityY(0);
+                            this.player1.y = 400;
+                            this.player1.x = 600;
+                        }
+                        
 
                     }
                 }
