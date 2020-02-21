@@ -3,6 +3,7 @@ import './Login.css';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Infobar from '../toolbar/Toolbar';
+import axios from 'axios';
 // import Card from '@material-ui/core/Card';
 // import CardContent from '@material-ui/core/CardContent';
 
@@ -51,7 +52,16 @@ class login extends React.Component {
     })
   }
   handleSubmit = (event) => {
-    event.preventDefault()
+    event.preventDefault()      //prevent refreshing the page
+    console.log(this.state)     //print the form data to the console
+    axios.post('http://localhost:3001/validate_user', this.state)   //axios is an http api
+    .then(response => {
+      console.log(response)
+    })
+    .catch(error => {
+      console.log(error)
+    })
+
   }
 
 
