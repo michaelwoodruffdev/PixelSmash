@@ -4,6 +4,8 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Infobar from '../toolbar/Toolbar';
+// import logo from './logo.png';
 
 class signup extends React.Component {
     constructor(props) {
@@ -43,6 +45,10 @@ class signup extends React.Component {
 
     render(){
         return(
+        // <BodyBackgroundColor backgroundColor = '#FF00F'>
+        <div className="container">
+        {/* <Infobar/> */}
+        <img src='https://www.freelogodesign.org/file/app/client/thumb/bf970f3b-3d14-44fc-b851-5b99674b0139_200x200.png?1581994698035'  width="150" height="100" alt='Logo'/>
         <Card className="card">
             <CardContent>
             <form onSubmit={this.handleSubmit}>
@@ -96,12 +102,15 @@ class signup extends React.Component {
                     />
                     <br></br>
                 </div>
-                <Button variant="contained" color="primary" type="submit" id="create">
+                <Button variant="contained"  type="submit" id="create">
                     Create Account
                 </Button>
             </form>
             </CardContent>
         </Card>
+        <br></br><br></br><br></br><br></br><br></br>
+        </div>
+        // </BodyBackgroundColor>
         
         );
     }

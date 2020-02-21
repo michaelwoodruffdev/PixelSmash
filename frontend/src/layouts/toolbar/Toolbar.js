@@ -7,10 +7,10 @@ import Typography from '@material-ui/core/Typography';
 class Infobar extends React.Component {
     render(){
        return(
-        <AppBar position="static">
+        <AppBar position="static" id="bar">
             <Toolbar>
-                <Typography variant="h6">
-                    Title
+                <Typography variant="h6" id="title">
+                    PixelSmash
                 </Typography>
             </Toolbar>
         </AppBar>
