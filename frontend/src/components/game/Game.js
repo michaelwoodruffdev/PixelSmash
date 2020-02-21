@@ -9,8 +9,8 @@ export default class Game extends React.Component {
         super(props);
 
         this.state = {
-            unmounted: false,
-            initialize: false,
+            unmounted: true,
+            initialize: true,
             game: {
                 width: 1200,
                 height: 675,
@@ -18,7 +18,7 @@ export default class Game extends React.Component {
                 physics: {
                     default: 'arcade',
                     arcade: {
-                        gravity: { y: 300 },
+                        gravity: { y: 900 },
                         debug: false
                     }
                 },
@@ -38,14 +38,17 @@ export default class Game extends React.Component {
 
                         // platforms
                         this.platforms = this.physics.add.staticGroup();
-                        this.platforms.create(600, 550, 'ground');
+                        this.platforms.create(600, 550, 'ground').setScale(.75).refreshBody();
+                        this.platforms.create(350, 400, 'ground').setScale(.2).refreshBody();
+                        this.platforms.create(850, 400, 'ground').setScale(.2).refreshBody();
 
                         // player
-                        this.player = this.physics.add.sprite(300, 400, 'player');
-                        this.player.setBounce(.2, .2);
-                        this.player.setCollideWorldBounds(true);
-                        this.physics.world.bounds = new Phaser.Geom.Rectangle(0, 0, 800, 600);
-                        this.player.height = 10;
+                        this.player = this.physics.add.sprite(600, 400, 'player');
+                        // this.player.setBounce(.2, .2);
+                        // this.player.setCollideWorldBounds(true);
+                        this.player.setMass(200);
+                        this.player.hasDoubleJumped = false;
+                        this.player.setSize(70, 70);
                         this.anims.create({
                             key: 'left',
                             frames: this.anims.generateFrameNumbers('player', { start: 18, end: 23 }),
@@ -59,10 +62,16 @@ export default class Game extends React.Component {
                             repeat: -1
                         });
                         this.anims.create({
-                            key: 'idle', 
-                            frames: this.anims.generateFrameNumbers('player', { start: 4, end: 5 }), 
-                            frameRate: 3, 
+                            key: 'idle',
+                            frames: this.anims.generateFrameNumbers('player', { start: 4, end: 5 }),
+                            frameRate: 3,
                             repeat: -1
+                        });
+                        this.anims.create({
+                            key: 'jump',
+                            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 5 }),
+                            frameRate: 15,
+                            repeat: 1
                         });
 
                         // text
@@ -78,7 +87,9 @@ export default class Game extends React.Component {
                         this.counter = 0;
 
                         // physics collisions
-                        this.physics.add.collider(this.player, this.platforms);
+                        this.physics.add.collider(this.player, this.platforms, () => {
+                            this.player.hasDoubleJumped = false;
+                        });
 
                         // initialize keyboard listeners
                         this.cursors = this.input.keyboard.createCursorKeys();
@@ -88,7 +99,7 @@ export default class Game extends React.Component {
                             console.log(this.player);
                             console.log(this.load);
                         }
-                    
+
                         // text animation
                         this.counter += .07;
                         if (this.counter >= 6.28) {
@@ -102,15 +113,26 @@ export default class Game extends React.Component {
                         // input handling
                         if (this.cursors.left.isDown) {
                             this.player.anims.play('left', true);
-                            this.player.setVelocityX(-100);
+                            this.player.setVelocityX(-250);
                         }
                         else if (this.cursors.right.isDown) {
                             this.player.anims.play('right', true);
-                            this.player.setVelocityX(100);
+                            this.player.setVelocityX(250);
                         }
                         else {
                             this.player.anims.play('idle', true);
                             this.player.setVelocityX(0);
+                        }
+                        if (this.cursors.space.isDown && (this.player.body.touching.down || !this.player.hasDoubleJumped)) {
+                            if (!this.player.body.touching.down) {
+                                this.player.hasDoubleJumped = true;
+                            }
+                            this.player.setVelocityY(-600);
+                        }
+                        if (this.player.y > 850 || this.player.x < -50 || this.player.x > 1250) {
+                            this.player.setVelocityY(0);
+                            this.player.y = 400;
+                            this.player.x = 600;
                         }
                     }
                 }
@@ -130,7 +152,7 @@ export default class Game extends React.Component {
         const { initialize, game } = this.state
         return (
             <div className="Game">
-                <button onClick={this.initializeGame}>start</button>
+                {/* <button onClick={this.initializeGame}>start</button> */}
                 {<IonPhaser game={game} initialize={initialize} />}
             </div>
         );
