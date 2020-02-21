@@ -47,7 +47,8 @@ export default class Game extends React.Component {
                         // this.player.setBounce(.2, .2);
                         // this.player.setCollideWorldBounds(true);
                         this.player.setMass(200);
-                        this.player.hasDoubleJumped = false;
+                        this.player.jumpCount = 1;
+                        this.player.isMidair = true;
                         this.player.setSize(70, 70);
                         this.anims.create({
                             key: 'left',
@@ -87,12 +88,33 @@ export default class Game extends React.Component {
                         this.counter = 0;
 
                         // physics collisions
-                        this.physics.add.collider(this.player, this.platforms, () => {
-                            this.player.hasDoubleJumped = false;
+                        this.groundCollision = this.physics.add.collider(this.player, this.platforms, () => {
+                            // this.player.jumpCount = 0;
+                            if (this.player.body.onFloor() === true) {
+                                console.log('hello floor');
+                                this.player.setVelocityY(0);
+                                this.player.jumpCount = 0;
+                            }
+                            if (this.player.body.onCeiling() === true) {
+                                // this.player.body.setCollideWor
+                            }
+                        }, 
+                        (player, platform) => {
+                            // if (this.player.body.velocity.y < 0) {
+                            //     if (player.y > platform.y)
+                            //     return false;
+                            // }
+                            if (player.y + 20 > platform.y) {
+                                return false;
+                            }
+                            return true;
                         });
+
+                        // this.groundCollision.overlapOnly = true;
 
                         // initialize keyboard listeners
                         this.cursors = this.input.keyboard.createCursorKeys();
+                        this.cursors.space.isPressedWithoutRelease = false;
                     },
                     update: function () {
                         if (this.counter === 0.00) {
@@ -107,7 +129,8 @@ export default class Game extends React.Component {
                         }
                         this.helloWorld.angle = 0 + (10 * Math.sin(this.counter));
                         if (this.counter === .1) {
-                            console.log(this.player.y);
+                            // console.log(this.player.y);
+                            console.log(this.player.body.velocity);
                         }
 
                         // input handling
@@ -123,6 +146,7 @@ export default class Game extends React.Component {
                             this.player.anims.play('idle', true);
                             this.player.setVelocityX(0);
                         }
+                        // if (this.player.jumpCount < 2 && this.cursors.space.isUp)
                         if (this.cursors.space.isDown && (this.player.body.touching.down || !this.player.hasDoubleJumped)) {
                             if (!this.player.body.touching.down) {
                                 this.player.hasDoubleJumped = true;
@@ -134,6 +158,25 @@ export default class Game extends React.Component {
                             this.player.y = 400;
                             this.player.x = 600;
                         }
+
+                        if (this.player.body.onFloor() === true) {
+                            this.player.setVelocityY(0);
+                        }
+                        this.cursors.space.onDown = (e) => {
+                            if (!this.cursors.space.isPressedWithoutRelease && this.player.jumpCount < 2) {
+                                this.player.jumpCount += 1;
+                                this.player.setVelocityY(-400);
+                                this.cursors.space.isPressedWithoutRelease = true;
+                                console.log('true jump');
+                            }
+                        }
+                        // if (this.cursors.spaceKeyDown) {
+                        //     this.cursors.spaceKeyTimer += 1;
+                        // }
+                        this.cursors.space.onUp = (e) => {
+                            this.cursors.space.isPressedWithoutRelease = false;
+                        }
+
                     }
                 }
             }
