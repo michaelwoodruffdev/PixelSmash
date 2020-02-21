@@ -113,16 +113,16 @@ app.post('/validate_user', (req,res) => {
 
 	var password = req.body.password;
 
-	
+	var user = { username : "test", password : "test" };
 
 	// Query for selecting records from database 
 	// with the username and password that were specified
 	// in the login form
 	
-	var query = "select * from userInfo where username = '"+username+"' and password = '"+password+"'";
+//	var query = "select * from userInfo where username = '"+username+"' and password = '"+password+"'";
 
 		
-	connection.query(query, function(err,result,fields)
+/*	connection.query(query, function(err,result,fields)
 	{
 		// Checks for error
 
@@ -138,7 +138,7 @@ app.post('/validate_user', (req,res) => {
 	
 			res.send("User found!");
 		}
-	});
+	});*/
 
 	
 });
@@ -236,12 +236,12 @@ app.post('/new_user', (req,res) => {
 
 
 
-// Port number is 3000
+// Port number is 3001
 
-const port = 3000;
+const port = 3001;
 
 
 
-// Listening to port 3000 message
+// Listening to port 3001 message
 
 app.listen(port, () => console.log(`Listening on port ${port} ...`));
