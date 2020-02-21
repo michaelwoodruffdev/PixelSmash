@@ -18,7 +18,7 @@ class signup extends React.Component {
           }
     }
 
-    handleUserNameChange = (event) => {
+    handleNameChange = (event) => {
         this.setState({
           name: event.target.value
         })
@@ -69,7 +69,7 @@ class signup extends React.Component {
                     required
                     id="outlined-required"
                     label="Surname"
-                    defaultValue="Surname"
+                    //defaultValue="Surname"
                     variant="outlined"
                     value={this.state.surname} 
                     onChange={this.handleSurnameChange} 
