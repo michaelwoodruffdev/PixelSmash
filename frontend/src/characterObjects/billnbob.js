@@ -25,11 +25,12 @@ export default {
             frameRate: 15,
             repeat: -1
         }
-    ],
+    ], 
+    fighterKey: 'billnbob', 
     movementSpeed: 400,
     frameDimensions: {
-        x: 192,
-        y: 192
+        frameWidth: 192,
+        frameHeight: 192
     },
     hitboxDimensions: {
         x: 80,
@@ -37,7 +38,7 @@ export default {
     },
     jumpHeights: {
         first: -450,
-        second: -450
+        second: -550
     },
     mass: 200,
     scale: .6
