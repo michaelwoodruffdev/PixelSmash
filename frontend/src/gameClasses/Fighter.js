@@ -9,6 +9,8 @@ class Fighter {
         this.isWalking = false;
         this.config = characterObject;
 
+        this.velocityX = 0;
+
         this.jumpCount = 1;
         this.isMidair = true;
 
@@ -82,26 +84,36 @@ class Fighter {
     // handle input each frame
     handleInput() {
         if (this.cursor.left.isDown) {
-            if (this.jumpCount === 0) {
-                // this.sprite.anims.play(this.config.fighterKey + 'left', true);
+            if (this.sprite.body.onFloor()) {
+                this.velocityX = -this.config.movementSpeed;
+                // this.sprite.setVelocityX(-this.config.movementSpeed);
+                this.sprite.setFlipX(true);
+            } else {
+                if (this.velocityX > -500) {
+                    this.velocityX -= 30;
+                }
+                // this.sprite.setVelocityX(this.sprite.body.deltaX() - 100);
             }
-            this.sprite.setVelocityX(-this.config.movementSpeed);
-            this.sprite.setFlipX(true);
             // console.log('left');
         }
         else if (this.cursor.right.isDown) {
-            if (this.jumpCount === 0) {
-                // this.sprite.anims.play(this.config.fighterKey + 'right', true);
+            if (this.sprite.body.onFloor()) {
+                this.velocityX = this.config.movementSpeed;
+                // this.sprite.setVelocityX(this.config.movementSpeed);
+                this.sprite.setFlipX(false);
+            } else {
+                if (this.velocityX < 500) {
+                    this.velocityX += 30;
+                }
             }
-            this.sprite.setVelocityX(this.config.movementSpeed);
-            this.sprite.setFlipX(false);
         }
         else {
             if (this.sprite.body.onFloor()) {
-                // this.sprite.anims.play(this.config.fighterKey + 'idle');
+                this.velocityX = 0;
             }
-            this.sprite.setVelocityX(0);
         }
+
+        this.sprite.setVelocityX(this.velocityX);
     }
 
     checkAnimation() {
