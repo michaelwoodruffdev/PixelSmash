@@ -5,6 +5,8 @@ class Fighter {
         this.scene = scene;
 
         this.sprite = null;
+        this.isFalling = true;
+        this.isWalking = false;
         this.config = characterObject;
 
         this.jumpCount = 1;
@@ -43,8 +45,14 @@ class Fighter {
     addPlatformCollisions(passablePlatforms, impassablePlatforms) {
         this.passableCollision = this.scene.physics.add.collider(this.sprite, passablePlatforms, () => {
             if (this.sprite.body.onFloor() === true) {
-                this.jumpCount = 0;
-                this.sprite.anims.play(this.config.fighterKey + 'idle');
+                if (this.isMidair) {
+                    console.log('landeddd');
+                    this.isMidair = false;
+                    // this.isWalking = true;
+                    this.isFalling = false;
+                    this.jumpCount = 0;
+                    this.sprite.anims.play(this.config.fighterKey + 'idle');
+                }
             }
         },
             (player, platform) => {
@@ -56,7 +64,17 @@ class Fighter {
 
         this.impassableCollision = this.scene.physics.add.collider(this.sprite, impassablePlatforms, (player, platform) => {
             if (this.sprite.body.onFloor() === true) {
-                this.jumpCount = 0;
+                if (this.isMidair) {
+                    console.log('landeddd');
+                    this.isMidair = false;
+                    // this.isWalking = true;
+                    this.isFalling = false;
+                    this.jumpCount = 0;
+                    this.sprite.anims.play(this.config.fighterKey + 'idle');
+                }
+                // if (!this.isWalking) {
+                //     this.isWalking = true;
+                // }
             }
         });
     }
@@ -65,24 +83,58 @@ class Fighter {
     handleInput() {
         if (this.cursor.left.isDown) {
             if (this.jumpCount === 0) {
-                this.sprite.anims.play(this.config.fighterKey + 'left', true);
+                // this.sprite.anims.play(this.config.fighterKey + 'left', true);
             }
             this.sprite.setVelocityX(-this.config.movementSpeed);
             this.sprite.setFlipX(true);
-            console.log('left');
+            // console.log('left');
         }
         else if (this.cursor.right.isDown) {
             if (this.jumpCount === 0) {
-                this.sprite.anims.play(this.config.fighterKey + 'right', true);
+                // this.sprite.anims.play(this.config.fighterKey + 'right', true);
             }
             this.sprite.setVelocityX(this.config.movementSpeed);
             this.sprite.setFlipX(false);
         }
         else {
             if (this.sprite.body.onFloor()) {
-                this.sprite.anims.play(this.config.fighterKey + 'idle');
+                // this.sprite.anims.play(this.config.fighterKey + 'idle');
             }
             this.sprite.setVelocityX(0);
+        }
+    }
+
+    checkAnimation() {
+        // console.log(this.sprite.body.deltaY());
+        // if (this.sprite.body.deltaY() < .5 && this.isMidair) {
+        //     console.log('landed');
+        //     this.sprite.anims.play(this.config.fighterKey + 'falling');
+        //     this.isMidair = false;
+        // }
+        if (!this.sprite.body.onFloor()) {
+            // console.log('2');
+            if (this.sprite.body.deltaY() > 0 && !this.isFalling) {
+                this.isFalling = true;
+                this.isMidair = true;
+                this.isWalking = false;
+                this.sprite.anims.play(this.config.fighterKey + 'falling');
+            }
+            if (this.jumpCount === 0) {
+                console.log('hey');
+                this.jumpCount = 1;
+            }
+        } else {
+            if (this.sprite.body.deltaX() === 0 && this.isWalking) {
+                this.isWalking = false;
+                this.sprite.anims.play(this.config.fighterKey + 'idle');
+            } else if (this.sprite.body.deltaX() !== 0 && !this.isWalking) {
+                if (this.sprite.body.deltaX() > 0) {
+                    this.sprite.anims.play(this.config.fighterKey + 'right');
+                } else if (this.sprite.body.deltaX() < 0) {
+                    this.sprite.anims.play(this.config.fighterKey + 'left');
+                }
+                this.isWalking = true;
+            }
         }
     }
 
@@ -93,14 +145,18 @@ class Fighter {
             if (!this.cursor.space.isPressedWithoutRelease && this.jumpCount < 2) {
                 if (this.jumpCount === 0) {
                     this.sprite.setVelocityY(this.config.jumpHeights.first);
+                    this.sprite.anims.play(this.config.fighterKey + 'firstjump');
                 }
                 else if (this.jumpCount === 1) {
                     this.sprite.setVelocityY(this.config.jumpHeights.second);
+                    this.sprite.anims.play(this.config.fighterKey + 'secondjump');
                 }
                 this.jumpCount += 1;
                 this.cursor.space.isPressedWithoutRelease = true;
+                this.isFalling = false;
+                this.isWalking = false;
                 console.log('true jump');
-                this.sprite.anims.play(this.config.fighterKey + 'jump');
+                this.isMidair = true;
             }
         }
 

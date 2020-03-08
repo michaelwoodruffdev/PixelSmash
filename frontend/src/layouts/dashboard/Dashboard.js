@@ -6,7 +6,7 @@ import { troomp, dhonu, billnbob } from '../../characterObjects/characters.js';
 function Dashboard() {
   return (
     <div className="Dashboard">
-      <Game player1Prop={billnbob} />
+      <Game player1Prop={dhonu} />
     </div>
   );
 }

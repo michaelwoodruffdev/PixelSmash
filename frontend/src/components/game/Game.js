@@ -12,11 +12,15 @@ export default class Game extends React.Component {
         let { player1Prop } = props;
 
         this.state = {
-            unmounted: true,
-            initialize: true,
+            unmounted: false,
+            initialize: false,
             game: {
                 width: 1200,
                 height: 675,
+                fps: {
+                    target: 30, 
+                    forceSetTimeOut: true
+                }, 
                 type: Phaser.AUTO,
                 physics: {
                     default: 'arcade',
@@ -66,12 +70,14 @@ export default class Game extends React.Component {
                         this.fighter1.createCursorEvents(this.cursors);
                     },
                     update: function () {
+
                         //timers
                         this.gameTimer += 1/60;
                         this.framesPassed += 1;
 
                         // input handling
                         this.fighter1.handleInput();
+                        this.fighter1.checkAnimation();
 
                         // boundaries
                         this.fighter1.checkDeath();
@@ -93,7 +99,7 @@ export default class Game extends React.Component {
         this.setState({ initialize: true })
     }
 
-    destroy = () => {
+    uninitializeGame = () => {
         this.setState({ unmounted: true })
     }
 
@@ -101,8 +107,10 @@ export default class Game extends React.Component {
         const { initialize, game } = this.state
         return (
             <div className="Game">
-                {/* <button onClick={this.initializeGame}>start</button> */}
-                {<IonPhaser game={game} initialize={initialize} />}
+                <button onClick={this.initializeGame}>start</button>
+                <button onClick={this.uninitializeGame}>stop</button>
+
+                {<IonPhaser game={game} initialize={initialize}/>}
             </div>
         );
     }
