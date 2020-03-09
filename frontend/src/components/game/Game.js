@@ -34,7 +34,6 @@ export default class Game extends React.Component {
                         this.cameras.main.setBackgroundColor('#24252A');
 
                         // fighters initialization
-                        // this.fighter1 = new Fighter(player1Prop, this);
                         this.fighters = playerConfigs.map(cf => new Fighter(cf, this));
                     },
                     preload: function () {

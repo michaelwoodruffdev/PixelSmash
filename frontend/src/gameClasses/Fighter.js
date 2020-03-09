@@ -120,15 +120,7 @@ class Fighter {
     }
 
     checkAnimation() {
-        // console.log(this.sprite.body.deltaY());
-        // if (this.sprite.body.deltaY() < .5 && this.isMidair) {
-        //     console.log('landed');
-        //     this.sprite.anims.play(this.config.fighterKey + 'falling');
-        //     this.isMidair = false;
-        // }
-        // this.sprite.setFlipX(this.sprite.body.deltaX() < 0);
         if (!this.sprite.body.onFloor()) {
-            // console.log('2');
             if (this.sprite.body.deltaY() > 0 && !this.isFalling) {
                 this.isFalling = true;
                 this.isMidair = true;
@@ -136,7 +128,6 @@ class Fighter {
                 this.sprite.anims.play(this.config.fighterKey + 'falling');
             }
             if (this.jumpCount === 0) {
-                console.log('hey');
                 this.jumpCount = 1;
             }
         } else {
