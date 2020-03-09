@@ -15,12 +15,24 @@ export default {
         },
         {
             key: 'idle',
-            frames: { start: 0, end: 8 },
-            frameRate: 7,
+            frames: { start: 4, end: 8 },
+            frameRate: 4,
             repeat: -1
         },
         {
-            key: 'jump',
+            key: 'firstjump',
+            frames: { start: 9, end: 15 },
+            frameRate: 15,
+            repeat: -1
+        }, 
+        {
+            key: 'secondjump',
+            frames: { start: 9, end: 15 },
+            frameRate: 15,
+            repeat: -1
+        }, 
+        {
+            key: 'falling',
             frames: { start: 9, end: 15 },
             frameRate: 15,
             repeat: -1

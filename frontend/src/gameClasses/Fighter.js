@@ -89,8 +89,8 @@ class Fighter {
                 // this.sprite.setVelocityX(-this.config.movementSpeed);
                 this.sprite.setFlipX(true);
             } else {
-                if (this.velocityX > -500) {
-                    this.velocityX -= 30;
+                if (this.velocityX > -200) {
+                    this.velocityX -= 40;
                 }
                 // this.sprite.setVelocityX(this.sprite.body.deltaX() - 100);
             }
@@ -102,8 +102,8 @@ class Fighter {
                 // this.sprite.setVelocityX(this.config.movementSpeed);
                 this.sprite.setFlipX(false);
             } else {
-                if (this.velocityX < 500) {
-                    this.velocityX += 30;
+                if (this.velocityX < 200) {
+                    this.velocityX += 40;
                 }
             }
         }
@@ -111,6 +111,9 @@ class Fighter {
             if (this.sprite.body.onFloor()) {
                 this.velocityX = 0;
             }
+        }
+        if (this.cursor.space.isDown) {
+            console.log('space is down');
         }
 
         this.sprite.setVelocityX(this.velocityX);
@@ -123,6 +126,7 @@ class Fighter {
         //     this.sprite.anims.play(this.config.fighterKey + 'falling');
         //     this.isMidair = false;
         // }
+        // this.sprite.setFlipX(this.sprite.body.deltaX() < 0);
         if (!this.sprite.body.onFloor()) {
             // console.log('2');
             if (this.sprite.body.deltaY() > 0 && !this.isFalling) {
@@ -179,7 +183,7 @@ class Fighter {
     }
 
     checkDeath() {
-        if (this.sprite.y > 800 || this.sprite.x < -250 || this.sprite.x > 1450) {
+        if (this.sprite.y > 1100 || this.sprite.x < -550 || this.sprite.x > 1650) {
             this.sprite.setVelocityY(0);
             this.sprite.y = 400;
             this.sprite.x = 600;

@@ -9,7 +9,7 @@ export default class Game extends React.Component {
     constructor(props) {
         super(props);
 
-        let { player1Prop } = props;
+        let { playerConfigs, stageConfig } = props;
 
         this.state = {
             unmounted: false,
@@ -34,13 +34,16 @@ export default class Game extends React.Component {
                         this.cameras.main.setBackgroundColor('#24252A');
 
                         // fighters initialization
-                        this.fighter1 = new Fighter(player1Prop, this);
+                        // this.fighter1 = new Fighter(player1Prop, this);
+                        this.fighters = playerConfigs.map(cf => new Fighter(cf, this));
                     },
                     preload: function () {
-                        this.fighter1.loadSpritesheet();
-                        // this.load.spritesheet('player1', player1Prop.spritesheetPath, { frameWidth: player1Prop.frameDimensions.x, frameHeight: player1Prop.frameDimensions.y });
-                        this.load.image('background', 'assets/background.png');
-                        this.load.image('ground', 'assets/ground.png');
+                        // fighter assets
+                        this.fighters.forEach(fighter => fighter.loadSpritesheet());
+
+                        // load stage assets
+                        this.load.image('background', stageConfig.assets.background);
+                        this.load.image('ground', stageConfig.assets.ground);
                     },
                     create: function () {
                         // timers
@@ -48,47 +51,49 @@ export default class Game extends React.Component {
                         this.framesPassed = 0;
                         
                         // background
-                        this.background = this.add.image(600, 337.5, 'background');
+                        this.background = this.add.image(600, 337.5, 'background').setScale(2);
                         
                         // platforms
                         this.passablePlatforms = this.physics.add.staticGroup();
-                        this.passablePlatforms.create(250, 400, 'ground').setScale(.2).refreshBody();
-                        this.passablePlatforms.create(950, 400, 'ground').setScale(.2).refreshBody();
-
+                        stageConfig.passablePlatforms.forEach(platform => {
+                            this.passablePlatforms.create(platform.x, platform.y, 'ground').setScale(platform.scale).refreshBody();
+                        });
                         this.impassablePlatforms = this.physics.add.staticGroup();
-                        this.impassablePlatforms.create(600, 550, 'ground').setScale(1.1).refreshBody();
+                        stageConfig.impassablePlatforms.forEach(platform => {
+                            this.impassablePlatforms.create(platform.x, platform.y, 'ground').setScale(platform.scale).refreshBody();
+                        });
 
-                        // fighter spritesheet
-                        this.player1 = this.fighter1.addSprite(600, 400);
-                        this.fighter1.loadAnimations();
-
-                        // physics collisions
-                        this.fighter1.addPlatformCollisions(this.passablePlatforms, this.impassablePlatforms);
+                        // fighters initialization
+                        for (let i = 0; i < this.fighters.length; i++) {
+                            this.fighters[i].addSprite(stageConfig.spawnLocations[i].x, stageConfig.spawnLocations[i].y);
+                            this.fighters[i].loadAnimations();
+                            this.fighters[i].addPlatformCollisions(this.passablePlatforms, this.impassablePlatforms)
+                            this.fighters[i].createCursorEvents(this.cursors)
+                        }
+                        
                         this.physics.world.setFPS(60);
-
-                        // keyboard listeners
-                        this.fighter1.createCursorEvents(this.cursors);
                     },
                     update: function () {
-
                         //timers
                         this.gameTimer += 1/60;
                         this.framesPassed += 1;
 
                         // input handling
-                        this.fighter1.handleInput();
-                        this.fighter1.checkAnimation();
+                        this.fighters.forEach(fighter => fighter.handleInput());
+                        this.fighters.forEach(fighter => fighter.checkAnimation());
 
                         // boundaries
-                        this.fighter1.checkDeath();
+                        this.fighters.forEach(fighter => fighter.checkDeath());
 
                         // camera positioning
-                        let cameraOffsetX = (this.player1.x - this.cameras.cameras[0].centerX) / 5;
+                        let cameraOffsetX = (((this.fighters[0].sprite.x + this.fighters[1].sprite.x) / 2) - this.cameras.cameras[0].centerX) / 5;
                         this.cameras.cameras[0].scrollX = cameraOffsetX;
 
-                        let cameraOffsetY = (this.player1.y - this.cameras.cameras[0].centerY) / 5;
+                        let cameraOffsetY = (((this.fighters[0].sprite.y + this.fighters[1].sprite.y) / 2) - this.cameras.cameras[0].centerY) / 5;
                         this.cameras.cameras[0].scrollY = cameraOffsetY;
-
+                        
+                        let zoomlevel = 1 - Math.abs(((this.fighters[0].sprite.x - this.fighters[1].sprite.x) / 3280))
+                        this.cameras.cameras[0].setZoom(zoomlevel);
                     }
                 }
             }
