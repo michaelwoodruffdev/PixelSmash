@@ -19,11 +19,10 @@ class Fighter {
 
     // loading spritesheet data
     loadSpritesheet() {
-        console.log('loading spritesheet for ' + this.config.fighterKey);
         this.scene.load.spritesheet(this.config.fighterKey, this.config.spritesheetPath, this.config.frameDimensions);
     }
+
     loadAnimations() {
-        console.log('loading animations for ' + this.config.fighterKey);
         this.config.spriteSheetAnimations.forEach(animation => {
             this.scene.anims.create({
                 key: this.config.fighterKey + animation.key,
@@ -36,7 +35,6 @@ class Fighter {
 
     // adding sprite and collisions
     addSprite(x, y) {
-        console.log('adding sprite to scene for ' + this.config.fighterKey);
         this.sprite = this.scene.physics.add.sprite(x, y, this.config.fighterKey);
         this.sprite.setMass(this.configmass);
         this.sprite.setSize(this.config.hitboxDimensions.x, this.config.hitboxDimensions.y);
@@ -44,13 +42,12 @@ class Fighter {
 
         return this.sprite;
     }
+
     addPlatformCollisions(passablePlatforms, impassablePlatforms) {
         this.passableCollision = this.scene.physics.add.collider(this.sprite, passablePlatforms, () => {
             if (this.sprite.body.onFloor() === true) {
                 if (this.isMidair) {
-                    console.log('landeddd');
                     this.isMidair = false;
-                    // this.isWalking = true;
                     this.isFalling = false;
                     this.jumpCount = 0;
                     this.sprite.anims.play(this.config.fighterKey + 'idle');
@@ -67,43 +64,45 @@ class Fighter {
         this.impassableCollision = this.scene.physics.add.collider(this.sprite, impassablePlatforms, (player, platform) => {
             if (this.sprite.body.onFloor() === true) {
                 if (this.isMidair) {
-                    console.log('landeddd');
                     this.isMidair = false;
-                    // this.isWalking = true;
                     this.isFalling = false;
                     this.jumpCount = 0;
                     this.sprite.anims.play(this.config.fighterKey + 'idle');
                 }
-                // if (!this.isWalking) {
-                //     this.isWalking = true;
-                // }
             }
         });
     }
 
+
+    addControls(controls) {
+        this.upKey = this.scene.input.keyboard.addKey(controls.keys.up);
+        this.downKey = this.scene.input.keyboard.addKey(controls.keys.down);
+        this.leftKey = this.scene.input.keyboard.addKey(controls.keys.left);
+        this.rightKey = this.scene.input.keyboard.addKey(controls.keys.right);
+        this.jumpKey = this.scene.input.keyboard.addKey(controls.keys.jump);
+        this.jumpKey.isPressedWithoutRelease = false;
+    }
+
     // handle input each frame
     handleInput() {
-        if (this.cursor.left.isDown) {
+        // x axis inputs
+        if (this.leftKey.isDown) {
             if (this.sprite.body.onFloor()) {
                 this.velocityX = -this.config.movementSpeed;
-                // this.sprite.setVelocityX(-this.config.movementSpeed);
                 this.sprite.setFlipX(true);
             } else {
                 if (this.velocityX > -200) {
-                    this.velocityX -= 40;
+                    this.velocityX -= 70;
                 }
-                // this.sprite.setVelocityX(this.sprite.body.deltaX() - 100);
             }
-            // console.log('left');
         }
-        else if (this.cursor.right.isDown) {
+        else if (this.rightKey.isDown) {
             if (this.sprite.body.onFloor()) {
                 this.velocityX = this.config.movementSpeed;
-                // this.sprite.setVelocityX(this.config.movementSpeed);
                 this.sprite.setFlipX(false);
             } else {
                 if (this.velocityX < 200) {
-                    this.velocityX += 40;
+                    this.velocityX += 70;
                 }
             }
         }
@@ -112,11 +111,30 @@ class Fighter {
                 this.velocityX = 0;
             }
         }
-        if (this.cursor.space.isDown) {
-            console.log('space is down');
-        }
-
         this.sprite.setVelocityX(this.velocityX);
+        // y axis inputs
+        this.jumpKey.on('down', (event) => {
+            if (!this.jumpKey.isPressedWithoutRelease && this.jumpCount < 2) {
+                this.jumpKey.isPressedWithoutRelease = true;
+                if (this.jumpCount === 0) {
+                    this.sprite.setVelocityY(this.config.jumpHeights.first);
+                    this.sprite.anims.play(this.config.fighterKey + 'firstjump');
+                }
+                else if (this.jumpCount === 1) {
+                    this.sprite.setVelocityY(this.config.jumpHeights.second);
+                    this.sprite.anims.play(this.config.fighterKey + 'secondjump');
+                }
+                this.jumpCount += 1;
+                this.isFalling = false;
+                this.isWalking = false;
+                this.isMidair = true;
+            }
+        });
+        this.jumpKey.on('up', (event) => {
+            if (this.jumpKey.isPressedWithoutRelease) {
+                this.jumpKey.isPressedWithoutRelease = false;
+            }
+        });
     }
 
     checkAnimation() {
@@ -145,38 +163,11 @@ class Fighter {
         }
     }
 
-    createCursorEvents() {
-        this.cursor = this.scene.input.keyboard.createCursorKeys();
-        this.cursor.space.isPressedWithoutRelease = false;
-        this.cursor.space.onDown = (e) => {
-            if (!this.cursor.space.isPressedWithoutRelease && this.jumpCount < 2) {
-                if (this.jumpCount === 0) {
-                    this.sprite.setVelocityY(this.config.jumpHeights.first);
-                    this.sprite.anims.play(this.config.fighterKey + 'firstjump');
-                }
-                else if (this.jumpCount === 1) {
-                    this.sprite.setVelocityY(this.config.jumpHeights.second);
-                    this.sprite.anims.play(this.config.fighterKey + 'secondjump');
-                }
-                this.jumpCount += 1;
-                this.cursor.space.isPressedWithoutRelease = true;
-                this.isFalling = false;
-                this.isWalking = false;
-                console.log('true jump');
-                this.isMidair = true;
-            }
-        }
-
-
-        this.cursor.space.onUp = (e) => {
-            this.cursor.space.isPressedWithoutRelease = false;
-        }
-    }
 
     checkDeath() {
         if (this.sprite.y > 1100 || this.sprite.x < -550 || this.sprite.x > 1650) {
             this.sprite.setVelocityY(0);
-            this.sprite.y = 400;
+            this.sprite.y = 200;
             this.sprite.x = 600;
             this.deathCount++;
         }

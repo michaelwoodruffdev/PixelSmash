@@ -9,7 +9,7 @@ export default class Game extends React.Component {
     constructor(props) {
         super(props);
 
-        let { playerConfigs, stageConfig } = props;
+        let { playerConfigs, stageConfig, controlConfigs } = props;
 
         this.state = {
             unmounted: false,
@@ -18,9 +18,9 @@ export default class Game extends React.Component {
                 width: 1200,
                 height: 675,
                 fps: {
-                    target: 30, 
+                    target: 30,
                     forceSetTimeOut: true
-                }, 
+                },
                 type: Phaser.AUTO,
                 physics: {
                     default: 'arcade',
@@ -48,10 +48,10 @@ export default class Game extends React.Component {
                         // timers
                         this.gameTimer = 0;
                         this.framesPassed = 0;
-                        
+
                         // background
                         this.background = this.add.image(600, 337.5, 'background').setScale(2);
-                        
+
                         // platforms
                         this.passablePlatforms = this.physics.add.staticGroup();
                         stageConfig.passablePlatforms.forEach(platform => {
@@ -66,15 +66,18 @@ export default class Game extends React.Component {
                         for (let i = 0; i < this.fighters.length; i++) {
                             this.fighters[i].addSprite(stageConfig.spawnLocations[i].x, stageConfig.spawnLocations[i].y);
                             this.fighters[i].loadAnimations();
-                            this.fighters[i].addPlatformCollisions(this.passablePlatforms, this.impassablePlatforms)
-                            this.fighters[i].createCursorEvents(this.cursors)
+                            this.fighters[i].addPlatformCollisions(this.passablePlatforms, this.impassablePlatforms);
+                            this.fighters[i].addControls(controlConfigs[i]);
                         }
-                        
-                        this.physics.world.setFPS(60);
+
+                        // input keys
+                        this.physics.world.setFPS(30);
+
+                        this.cameras.cameras[0].fadeIn(1000);
                     },
                     update: function () {
                         //timers
-                        this.gameTimer += 1/60;
+                        this.gameTimer += 1 / 60;
                         this.framesPassed += 1;
 
                         // input handling
@@ -88,10 +91,10 @@ export default class Game extends React.Component {
                         let cameraOffsetX = (((this.fighters[0].sprite.x + this.fighters[1].sprite.x) / 2) - this.cameras.cameras[0].centerX) / 5;
                         this.cameras.cameras[0].scrollX = cameraOffsetX;
 
-                        let cameraOffsetY = (((this.fighters[0].sprite.y + this.fighters[1].sprite.y) / 2) - this.cameras.cameras[0].centerY) / 5;
+                        let cameraOffsetY = ((((this.fighters[0].sprite.y + this.fighters[1].sprite.y) / 2) - this.cameras.cameras[0].centerY) / 5) - 100;
                         this.cameras.cameras[0].scrollY = cameraOffsetY;
-                        
-                        let zoomlevel = 1 - Math.abs(((this.fighters[0].sprite.x - this.fighters[1].sprite.x) / 3280))
+
+                        let zoomlevel = 1 - Math.abs(((this.fighters[0].sprite.x - this.fighters[1].sprite.x) / 3280)) - .1;
                         this.cameras.cameras[0].setZoom(zoomlevel);
                     }
                 }
@@ -105,6 +108,7 @@ export default class Game extends React.Component {
 
     uninitializeGame = () => {
         this.setState({ unmounted: true })
+        this.setState({ initialize: false })
     }
 
     render() {
@@ -114,7 +118,7 @@ export default class Game extends React.Component {
                 <button onClick={this.initializeGame}>start</button>
                 <button onClick={this.uninitializeGame}>stop</button>
 
-                {<IonPhaser game={game} initialize={initialize}/>}
+                {<IonPhaser game={game} initialize={initialize} />}
             </div>
         );
     }

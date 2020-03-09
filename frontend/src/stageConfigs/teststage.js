@@ -5,31 +5,36 @@ export default {
     }, 
     passablePlatforms: [
         {
-            x: 250, 
-            y: 400, 
+            x: 100, 
+            y: 250, 
             scale: .2
         }, 
         {
-            x: 950, 
-            y: 400, 
+            x: 1100, 
+            y: 250, 
             scale: .2
+        }, 
+        {
+            x: 600, 
+            y: 200, 
+            scale: .3
         }
     ], 
     impassablePlatforms: [
         {
             x: 600, 
-            y: 550, 
-            scale: 1.1
+            y: 450, 
+            scale: 1.3
         }
     ],
     spawnLocations: [
         {
             x: 600, 
-            y: 400
+            y: 300
         }, 
         {
             x: 900, 
-            y: 400
+            y: 300
         }
     ]
 }
