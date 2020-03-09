@@ -7,3 +7,9 @@
 * found great component by proyecto26 called ion-phaser https://github.com/proyecto26/ion-phaser
 * created game component to wrap the phaserJS canvas
 * https://phaser.discourse.group/t/phaser-3-interaction-with-react/308/10
+
+01/25
+* trying to get images to load. It looks like when I load images that they are seen as html in the network tab of devtools in browser
+* this doesn't happen when i try to load same image in standard nonreact phaser project.
+* i added an issue to the github where we are getting this library to embed a phaser canvas into react component because it might be due to that
+* https://github.com/proyecto26/ion-phaser/issues/13
