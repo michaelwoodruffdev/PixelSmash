@@ -9,7 +9,7 @@ import wasdControls from '../../controlConfigs/wasd.js';
 function Dashboard() {
   return (
     <div className="Dashboard">
-      <Game playerConfigs={[billnbob, dhonu]} stageConfig={teststage} controlConfigs={[wasdControls, defaultControls]}/>
+      <Game playerConfigs={[troomp, dhonu]} stageConfig={teststage} controlConfigs={[wasdControls, defaultControls]}/>
     </div>
   );
 }

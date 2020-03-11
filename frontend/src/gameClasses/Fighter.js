@@ -47,6 +47,7 @@ class Fighter {
         this.passableCollision = this.scene.physics.add.collider(this.sprite, passablePlatforms, () => {
             if (this.sprite.body.onFloor() === true) {
                 if (this.isMidair) {
+                    console.log('here');
                     this.isMidair = false;
                     this.isFalling = false;
                     this.jumpCount = 0;

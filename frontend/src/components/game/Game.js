@@ -4,6 +4,12 @@ import { IonPhaser } from '@ion-phaser/react';
 import './Game.css';
 import Fighter from '../../gameClasses/Fighter.js';
 
+const handleCamera = (scene) => {
+    scene.cameras.cameras[0].scrollX = (((scene.fighters[0].sprite.x + scene.fighters[1].sprite.x) / 2) - scene.cameras.cameras[0].centerX) / 5;
+    scene.cameras.cameras[0].scrollY = ((((scene.fighters[0].sprite.y + scene.fighters[1].sprite.y) / 2) - scene.cameras.cameras[0].centerY) / 5) - 100;
+    scene.cameras.cameras[0].setZoom(1 - Math.abs(((scene.fighters[0].sprite.x - scene.fighters[1].sprite.x) / 3280)) - .1);
+}
+
 export default class Game extends React.Component {
 
     constructor(props) {
@@ -34,7 +40,7 @@ export default class Game extends React.Component {
                         this.cameras.main.setBackgroundColor('#24252A');
 
                         // fighters initialization
-                        this.fighters = playerConfigs.map(cf => new Fighter(cf, this));
+                        this.fighters = playerConfigs.map(pConf => new Fighter(pConf, this));
                     },
                     preload: function () {
                         // fighter assets
@@ -80,22 +86,14 @@ export default class Game extends React.Component {
                         this.gameTimer += 1 / 60;
                         this.framesPassed += 1;
 
-                        // input handling
-                        this.fighters.forEach(fighter => fighter.handleInput());
-                        this.fighters.forEach(fighter => fighter.checkAnimation());
+                        // handle fighters input and current animation state
+                        this.fighters.forEach(fighter => {
+                            fighter.handleInput();
+                            fighter.checkAnimation();
+                            fighter.checkDeath();
+                        });
 
-                        // boundaries
-                        this.fighters.forEach(fighter => fighter.checkDeath());
-
-                        // camera positioning
-                        let cameraOffsetX = (((this.fighters[0].sprite.x + this.fighters[1].sprite.x) / 2) - this.cameras.cameras[0].centerX) / 5;
-                        this.cameras.cameras[0].scrollX = cameraOffsetX;
-
-                        let cameraOffsetY = ((((this.fighters[0].sprite.y + this.fighters[1].sprite.y) / 2) - this.cameras.cameras[0].centerY) / 5) - 100;
-                        this.cameras.cameras[0].scrollY = cameraOffsetY;
-
-                        let zoomlevel = 1 - Math.abs(((this.fighters[0].sprite.x - this.fighters[1].sprite.x) / 3280)) - .1;
-                        this.cameras.cameras[0].setZoom(zoomlevel);
+                        handleCamera(this);
                     }
                 }
             }

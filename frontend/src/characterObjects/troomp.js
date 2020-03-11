@@ -14,16 +14,35 @@ export default {
             repeat: -1
         },
         {
+            key: 'firstjump', 
+            frames: { start: 2, end: 10 }, 
+            frameRate: 30, 
+            repeat: -1
+        }, 
+        {
+            key: 'secondjump', 
+            frames: { start: 2, end: 10 }, 
+            frameRate: 30, 
+            repeat: -1
+        }, 
+        {
+            key: 'falling', 
+            frames: { start: 2, end: 10 }, 
+            frameRate: 30, 
+            repeat: -1
+        }, 
+        {
             key: 'idle',
             frames: { start: 4, end: 5 },
             frameRate: 3,
             repeat: -1
         }
     ],
+    fighterKey: 'troomp', 
     movementSpeed: 400,
     frameDimensions: {
-        x: 100,
-        y: 100
+        frameWidth: 100,
+        frameHeight: 100
     },
     hitboxDimensions: {
         x: 30,
@@ -33,5 +52,6 @@ export default {
         first: 80,
         second: 40
     },
-    mass: 200
+    mass: 200, 
+    scale: 2
 }
