@@ -4,7 +4,8 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import Infobar from '../toolbar/Toolbar';
+import axios from 'axios';
+//import Infobar from '../toolbar/Toolbar';
 // import logo from './logo.png';
 
 class signup extends React.Component {
@@ -41,6 +42,14 @@ class signup extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault()
+        console.log(this.state)     //print the form data to the console
+        axios.post('http://localhost:3001/validate_user', this.state)   //axios is an http api
+        .then(response => {
+        console.log(response)
+      })
+        .catch(error => {
+        console.log(error)
+      })
       }
 
     render(){
@@ -95,6 +104,7 @@ class signup extends React.Component {
                     id="outlined-required"
                     label="Password"
                     defaultValue="Password"
+                    type="password"
                     variant="outlined"
                     value={this.state.password}
                     onChange={this.handlePasswordChange}
