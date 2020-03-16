@@ -8,6 +8,7 @@ class Fighter {
         this.isFalling = true;
         this.isWalking = false;
         this.config = characterObject;
+        this.config.fighterKey += 'sampleusername';
 
         this.velocityX = 0;
 
@@ -81,7 +82,7 @@ class Fighter {
         this.downKey = this.scene.input.keyboard.addKey(controls.keys.down);
         this.leftKey = this.scene.input.keyboard.addKey(controls.keys.left);
         this.rightKey = this.scene.input.keyboard.addKey(controls.keys.right);
-        
+
         this.jumpKey = this.scene.input.keyboard.addKey(controls.keys.jump);
         this.jumpKey.isPressedWithoutRelease = false;
         this.jumpKey.on('down', (event) => {
@@ -112,9 +113,10 @@ class Fighter {
     }
 
     // handle input each frame
-    handleWalk() {
+    handleWalk(socketcontext) {
         // left key input
         if (this.leftKey.isDown) {
+            socketcontext.emit('leftPressed', this.config.fighterKey);
             if (this.sprite.body.onFloor()) {
                 this.velocityX = -this.config.movementSpeed;
             } else {
@@ -161,14 +163,14 @@ class Fighter {
             if (this.sprite.body.deltaX() === 0 && this.isWalking) {
                 this.isWalking = false;
                 this.sprite.anims.play(this.config.fighterKey + 'idle');
-            } 
+            }
             // walking
             else if (this.sprite.body.deltaX() !== 0 && !this.isWalking) {
                 // right
                 if (this.sprite.body.deltaX() > 0) {
                     this.sprite.setFlipX(false);
                     this.sprite.anims.play(this.config.fighterKey + 'right');
-                } 
+                }
                 // left
                 else if (this.sprite.body.deltaX() < 0) {
                     this.sprite.setFlipX(true);

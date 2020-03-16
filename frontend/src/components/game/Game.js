@@ -23,6 +23,15 @@ export default class Game extends React.Component {
         this.state = {
             unmounted: false,
             initialize: false,
+            game: null
+        }
+    }
+
+    componentDidMount() {
+        console.log(this.context);
+        let { playerConfigs, stageConfig, controlConfigs } = this.props;
+        let context = this.context;
+        this.setState({
             game: {
                 width: 1200,
                 height: 675,
@@ -91,7 +100,7 @@ export default class Game extends React.Component {
 
                         // handle fighters input and current animation state
                         this.fighters.forEach(fighter => {
-                            fighter.handleWalk();
+                            fighter.handleWalk(context);
                             fighter.checkMovementState();
                             fighter.checkDeath();
                         });
@@ -100,7 +109,7 @@ export default class Game extends React.Component {
                     }
                 }
             }
-        }
+        })
     }
 
     onConnected() {

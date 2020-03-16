@@ -244,6 +244,14 @@ const io = require('socket.io')(http);
 io.on('connection', socket => {
 	socket.emit('connected');
 	console.log('new socket connected');
+
+	socket.on('hello', () => {
+		console.log('hello????');
+	});
+
+	socket.on('leftPressed', (fighterKey) => {
+		console.log('left is being pressed by ' + fighterKey);
+	});
 });
 
 
