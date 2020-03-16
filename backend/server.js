@@ -88,6 +88,8 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname+'/index.html')));
 
 
 
+
+
 // Sends user to html page for user creation
 
 app.get('/create_user', (req,res) => res.sendFile(path.join(__dirname+'/create.html')));
@@ -232,16 +234,25 @@ app.post('/new_user', (req,res) => {
 });
 
 
+// socket testing
+app.get('/testing', (req, res) => {
+	res.status(200).send({ hello: "world" }).end();
+});
 
-
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+io.on('connection', socket => {
+	socket.emit('connected');
+	console.log('new socket connected');
+});
 
 
 // Port number is 3000
 
-const port = 3000;
+const port = 8080;
 
 
 
 // Listening to port 3000 message
 
-app.listen(port, () => console.log(`Listening on port ${port} ...`));
+http.listen(port, () => console.log(`Listening on port ${port} ...`));

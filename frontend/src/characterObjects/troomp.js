@@ -53,5 +53,5 @@ export default {
         second: 40
     },
     mass: 200, 
-    scale: 2
+    scale: .8
 }

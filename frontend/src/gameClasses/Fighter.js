@@ -43,19 +43,23 @@ class Fighter {
         return this.sprite;
     }
 
+    land() {
+        this.isMidair = false;
+        this.isFalling = false;
+        this.jumpCount = 0;
+        this.sprite.anims.play(this.config.fighterKey + 'idle');
+    }
+
     addPlatformCollisions(passablePlatforms, impassablePlatforms) {
         this.passableCollision = this.scene.physics.add.collider(this.sprite, passablePlatforms, () => {
             if (this.sprite.body.onFloor() === true) {
                 if (this.isMidair) {
-                    console.log('here');
-                    this.isMidair = false;
-                    this.isFalling = false;
-                    this.jumpCount = 0;
-                    this.sprite.anims.play(this.config.fighterKey + 'idle');
+                    this.land();
                 }
             }
         },
             (player, platform) => {
+                // conditionally pass through platform (in this case if player is moving upwards below platform)
                 if (player.y + 20 > platform.y || this.sprite.body.velocity.y < 0) {
                     return false;
                 }
@@ -65,10 +69,7 @@ class Fighter {
         this.impassableCollision = this.scene.physics.add.collider(this.sprite, impassablePlatforms, (player, platform) => {
             if (this.sprite.body.onFloor() === true) {
                 if (this.isMidair) {
-                    this.isMidair = false;
-                    this.isFalling = false;
-                    this.jumpCount = 0;
-                    this.sprite.anims.play(this.config.fighterKey + 'idle');
+                    this.land();
                 }
             }
         });
@@ -80,47 +81,19 @@ class Fighter {
         this.downKey = this.scene.input.keyboard.addKey(controls.keys.down);
         this.leftKey = this.scene.input.keyboard.addKey(controls.keys.left);
         this.rightKey = this.scene.input.keyboard.addKey(controls.keys.right);
+        
         this.jumpKey = this.scene.input.keyboard.addKey(controls.keys.jump);
         this.jumpKey.isPressedWithoutRelease = false;
-    }
-
-    // handle input each frame
-    handleInput() {
-        // x axis inputs
-        if (this.leftKey.isDown) {
-            if (this.sprite.body.onFloor()) {
-                this.velocityX = -this.config.movementSpeed;
-                this.sprite.setFlipX(true);
-            } else {
-                if (this.velocityX > -200) {
-                    this.velocityX -= 70;
-                }
-            }
-        }
-        else if (this.rightKey.isDown) {
-            if (this.sprite.body.onFloor()) {
-                this.velocityX = this.config.movementSpeed;
-                this.sprite.setFlipX(false);
-            } else {
-                if (this.velocityX < 200) {
-                    this.velocityX += 70;
-                }
-            }
-        }
-        else {
-            if (this.sprite.body.onFloor()) {
-                this.velocityX = 0;
-            }
-        }
-        this.sprite.setVelocityX(this.velocityX);
-        // y axis inputs
         this.jumpKey.on('down', (event) => {
             if (!this.jumpKey.isPressedWithoutRelease && this.jumpCount < 2) {
+                // jump key was pressed
                 this.jumpKey.isPressedWithoutRelease = true;
+                // first jump
                 if (this.jumpCount === 0) {
                     this.sprite.setVelocityY(this.config.jumpHeights.first);
                     this.sprite.anims.play(this.config.fighterKey + 'firstjump');
                 }
+                // double jump
                 else if (this.jumpCount === 1) {
                     this.sprite.setVelocityY(this.config.jumpHeights.second);
                     this.sprite.anims.play(this.config.fighterKey + 'secondjump');
@@ -138,7 +111,39 @@ class Fighter {
         });
     }
 
-    checkAnimation() {
+    // handle input each frame
+    handleWalk() {
+        // left key input
+        if (this.leftKey.isDown) {
+            if (this.sprite.body.onFloor()) {
+                this.velocityX = -this.config.movementSpeed;
+            } else {
+                if (this.velocityX > -200) {
+                    this.velocityX -= 70;
+                }
+            }
+        }
+        // right key input
+        else if (this.rightKey.isDown) {
+            if (this.sprite.body.onFloor()) {
+                this.velocityX = this.config.movementSpeed;
+            } else {
+                if (this.velocityX < 200) {
+                    this.velocityX += 70;
+                }
+            }
+        }
+        // no left or right input
+        else {
+            if (this.sprite.body.onFloor()) {
+                this.velocityX = 0;
+            }
+        }
+        this.sprite.setVelocityX(this.velocityX);
+    }
+
+    checkMovementState() {
+        // midair
         if (!this.sprite.body.onFloor()) {
             if (this.sprite.body.deltaY() > 0 && !this.isFalling) {
                 this.isFalling = true;
@@ -149,14 +154,24 @@ class Fighter {
             if (this.jumpCount === 0) {
                 this.jumpCount = 1;
             }
-        } else {
+        }
+        // on ground 
+        else {
+            // idle
             if (this.sprite.body.deltaX() === 0 && this.isWalking) {
                 this.isWalking = false;
                 this.sprite.anims.play(this.config.fighterKey + 'idle');
-            } else if (this.sprite.body.deltaX() !== 0 && !this.isWalking) {
+            } 
+            // walking
+            else if (this.sprite.body.deltaX() !== 0 && !this.isWalking) {
+                // right
                 if (this.sprite.body.deltaX() > 0) {
+                    this.sprite.setFlipX(false);
                     this.sprite.anims.play(this.config.fighterKey + 'right');
-                } else if (this.sprite.body.deltaX() < 0) {
+                } 
+                // left
+                else if (this.sprite.body.deltaX() < 0) {
+                    this.sprite.setFlipX(true);
                     this.sprite.anims.play(this.config.fighterKey + 'left');
                 }
                 this.isWalking = true;
