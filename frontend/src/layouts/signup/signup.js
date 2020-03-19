@@ -1,10 +1,12 @@
+import axios from 'axios';
+
 import React from 'react';
 import './signup.css';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import Infobar from '../toolbar/Toolbar';
+//import Infobar from '../toolbar/Toolbar';
 // import logo from './logo.png';
 
 class signup extends React.Component {
@@ -14,9 +16,22 @@ class signup extends React.Component {
             name: '',
             surename:'',
             email:'',
-            password: ''
+            password: '',
+	    users : []
+
           }
     }
+    componentDidMount(){
+                fetch('http://18.222.189.77:5000/user_info')
+                .then(res=> {
+                        console.log(res);
+                        return res.json();
+                })
+                .then(users=>{
+                        console.log(users);
+                        this.setState({ users })
+                });
+        }
 
     handleNameChange = (event) => {
         this.setState({
@@ -41,6 +56,24 @@ class signup extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault()
+	var userExists = false;
+	for(var i = 0; i <this.state.users.length;i++)
+	    {
+		    if(this.state.username == this.state.users[i].username && this.state.password == this.state.users[i].password)
+		    {
+			    console.log("User already exists");
+			    userExists = true;
+		    }
+	    }
+	    if(userExists == false)
+	    {
+	axios
+	    .post('http://18.222.189.77:5000/create_user',this.state)
+	    .then(()=> console.log("User was created"))
+	    .catch(err => {
+		console.log(err);
+	    });
+	    }
       }
 
     render(){

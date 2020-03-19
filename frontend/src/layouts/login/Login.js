@@ -38,6 +38,18 @@ class login extends React.Component {
     }
 
   }
+	
+	componentDidMount(){
+                fetch('http://18.222.189.77:5000/user_info')
+                .then(res=> {
+                        console.log(res);
+                        return res.json();
+                })
+                .then(users=>{
+                        console.log(users);
+                        this.setState({ users })
+                });
+        }
 
 
   //runs on every keystroke to update the React state, the displayed value will update as the user types
@@ -53,15 +65,16 @@ class login extends React.Component {
   }
   handleSubmit = (event) => {
     event.preventDefault()      //prevent refreshing the page
-    console.log(this.state)     //print the form data to the console
-    axios.post('http://localhost:3001/validate_user', this.state)   //axios is an http api
-    .then(response => {
-      console.log(response)
-    })
-    .catch(error => {
-      console.log(error)
-    })
-
+	var userFound = false;	
+	  for(var i = 0; i < this.state.users.length ; i++)
+	  {
+		  if(this.state.username == this.state.users[i].username && this.state.password == this.state.users[i].password)
+		  {
+			  console.log("Access Granted");
+			  userFound = true;
+		  }
+	  }
+	
   }
 
 
