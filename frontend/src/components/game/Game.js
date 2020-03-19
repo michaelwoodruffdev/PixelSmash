@@ -95,7 +95,7 @@ export default class Game extends React.Component {
                     },
                     update: function () {
                         //timers
-                        this.gameTimer += 1 / 60;
+                        this.gameTimer += 1 / 30;
                         this.framesPassed += 1;
 
                         // handle fighters input and current animation state
@@ -130,7 +130,7 @@ export default class Game extends React.Component {
         return (
             <div className="Game">
                 <button onClick={this.initializeGame}>start</button>
-                <button onClick={this.uninitializeGame}>stop</button>
+                {/* <button onClick={this.uninitializeGame}>stop</button> */}
 
                 {<IonPhaser game={game} initialize={initialize} />}
                 <Event event="connected" handler={this.onConnected} />
