@@ -21,6 +21,8 @@ class signup extends React.Component {
 
           }
     }
+
+	// Milesh added this function to get data from app.js
     componentDidMount(){
                 fetch('http://18.222.189.77:5000/user_info')
                 .then(res=> {
@@ -53,7 +55,8 @@ class signup extends React.Component {
           password: event.target.value
         })
       }
-
+	
+	// Milesh edited this function to send data to app.js
     handleSubmit = (event) => {
         event.preventDefault()
 	var userExists = false;

@@ -38,7 +38,7 @@ class login extends React.Component {
     }
 
   }
-	
+	// Milesh added this function to fetch data from app.js
 	componentDidMount(){
                 fetch('http://18.222.189.77:5000/user_info')
                 .then(res=> {
@@ -63,6 +63,8 @@ class login extends React.Component {
       password: event.target.value
     })
   }
+
+	// Milesh edited this function to send data to app.js in the backend
   handleSubmit = (event) => {
     event.preventDefault()      //prevent refreshing the page
 	var userFound = false;	
@@ -72,6 +74,15 @@ class login extends React.Component {
 		  {
 			  console.log("Access Granted");
 			  userFound = true;
+		  
+	 		 
+
+	  		axios
+	  		.post("http://18.222.189.77:5000/main", this.state)
+			  .then(()=>console.log("User login successful"))
+	  		.catch(err => {
+		  		console.log(err);
+	  		});
 		  }
 	  }
 	
