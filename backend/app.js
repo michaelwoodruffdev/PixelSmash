@@ -137,6 +137,7 @@ var query = "select * from user";
 
 
 
+var id = 0;
 
 
 
@@ -178,14 +179,19 @@ app.post('/create_user', function(req,res) {
 
 	
 	// Encrypt user information
-	var encryptedUserInfo = crypto.AES.encrypt(JSON.stringify(userInfo), 'secret key 123').toString();
+	var encryptedUserInfo = crypto.AES.encrypt(JSON.stringify(req.body), 'secret key 123').toString();
 
-	console.log(userInfo);
-	console.log(encryptedUserInfo);
+	//console.log(userInfo);
+	//console.log(encryptedUserInfo);
 	
+	
+	// Decrypts user's information
+	
+	var decryptedUserInfo = crypto.AES.decrypt(JSON.stringify(encryptedUserInfo), 'secret key 123').toString()
 
+	console.log(decryptedUserInfo);
 	// This query will insert a new user as a new record to the table user
-
+	
 	var query = "insert into user values ('"+idUser+"','"+username+"','"+username+"','"+surname+"','"+email+"','"+password+"');";
 	
 
@@ -206,24 +212,88 @@ app.get('/', function (req, res) {
    res.send('Hello World');
 })
 
-app.post('/main',(req,res)=>{
+app.get('/friendsinfo', function(req,res) {
+	
+	var id = 1
+});
+app.post('/main',(req,resp)=>{
 	
 	// This varible will store the user's information
 	// as an object whose information will be tokenized
-	var payload = {
+/*	var payload = {
 		"username" : req.body.username,
 		"password" : req.body.password
-	};
+	};*/
 
 	// This secret variable will store the tokenized version of the object
 	var secret = "";
 	
 
 
+
 	// This is the code that encrypts the user's information
-	secret = crypto.AES.encrypt(JSON.stringify(payload), 'secret key 123').toString();
-	console.log(payload);
-	console.log(secret);
+	secret = crypto.Rabbit.encrypt(JSON.stringify(req.body), 'secret key 123').toString();
+//	console.log(payload);
+	console.log("Encrypted info :",secret);
+	var payload = JSON.parse(crypto.enc.Utf8.stringify(crypto.Rabbit.decrypt(secret, 'secret key 123')));
+	console.log("Decrypted info: ",payload.username);
+
+	var username = payload.username;
+
+	var sql = 'CALL getUserId("'+username+'")';
+	
+	var userInfo = {
+		username : username,
+		friends : []
+	};
+	connection.query(sql,true,(error,results,fields) => {
+		if(error)
+		{
+			console.error(error.message);
+		}
+
+		
+
+
+
+
+		// The previous stored procedure will only return 
+		// the id of the user that has logged so it will return one
+		// id, in the following code we will print to the console
+		// all the friends of the user
+
+		results[0].forEach((result) =>
+			{
+				// This console.log statement prints the id pertaining to the user with the
+				// given username
+				id = result.iduser;
+				console.log(`User id for `+username+` is `+id);
+
+				// Now we are getting the friends of this user using the 
+				// user's id and calling the stored procedure
+				// getFriends
+
+
+				var sql2 = "CALL getFriends("+id+")";
+				console.log("The friends of "+username+" are");
+				connection.query(sql2,true,(err,res,param)=>{
+					
+					if(err)console.error(err.message);
+
+					res[0].forEach((i) =>
+						{
+							userInfo.friends.push(i.username);
+							console.log(userInfo);
+						});
+					return resp.send(userInfo);
+				});
+
+				console.log(userInfo);
+					
+			});
+	});
+
+	console.log(userInfo);
 
 	// Socket shit to play with later
 	io.sockets.on('connection', function(socket) {
