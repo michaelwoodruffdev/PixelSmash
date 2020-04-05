@@ -141,12 +141,31 @@ var id = 0;
 
 
 
-// Send data to login directory for authentication
+// Send user data to login form for authentication
+
 app.get('/user_info', function(req,res) {
 	
 return res.send(users);
 
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -177,23 +196,48 @@ app.post('/create_user', function(req,res) {
 		"email" : email
 	};
 
+
+
+
+
+
+
 	
 	// Encrypt user information
 	var encryptedUserInfo = crypto.AES.encrypt(JSON.stringify(req.body), 'secret key 123').toString();
 
-	//console.log(userInfo);
-	//console.log(encryptedUserInfo);
+	
+
+
+
 	
 	
 	// Decrypts user's information
 	
 	var decryptedUserInfo = crypto.AES.decrypt(JSON.stringify(encryptedUserInfo), 'secret key 123').toString()
 
-	console.log(decryptedUserInfo);
+	
+
+
+
+
+
+
+
+
 	// This query will insert a new user as a new record to the table user
 	
 	var query = "insert into user values ('"+idUser+"','"+username+"','"+username+"','"+surname+"','"+email+"','"+password+"');";
 	
+
+
+
+
+
+
+
+
+
 
 
 	// Here the query will be run and we will check for a duplicate entry
@@ -205,25 +249,40 @@ app.post('/create_user', function(req,res) {
 
 		else console.log("New user added successfully!");
 	});
+
+
+
+
+
+
 });
 
-
+// Test
 app.get('/', function (req, res) {
    res.send('Hello World');
 })
 
-app.get('/friendsinfo', function(req,res) {
-	
-	var id = 1
-});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 app.post('/main',(req,resp)=>{
 	
-	// This varible will store the user's information
-	// as an object whose information will be tokenized
-/*	var payload = {
-		"username" : req.body.username,
-		"password" : req.body.password
-	};*/
 
 	// This secret variable will store the tokenized version of the object
 	var secret = "";
@@ -233,10 +292,10 @@ app.post('/main',(req,resp)=>{
 
 	// This is the code that encrypts the user's information
 	secret = crypto.Rabbit.encrypt(JSON.stringify(req.body), 'secret key 123').toString();
-//	console.log(payload);
+
 	console.log("Encrypted info :",secret);
 	var payload = JSON.parse(crypto.enc.Utf8.stringify(crypto.Rabbit.decrypt(secret, 'secret key 123')));
-	console.log("Decrypted info: ",payload.username);
+	console.log("Decrypted info: ",payload);
 
 	var username = payload.username;
 
@@ -275,31 +334,62 @@ app.post('/main',(req,resp)=>{
 
 
 				var sql2 = "CALL getFriends("+id+")";
-				console.log("The friends of "+username+" are");
+//				console.log("The friends of "+username+" are");
 				connection.query(sql2,true,(err,res,param)=>{
 					
 					if(err)console.error(err.message);
-
+					
 					res[0].forEach((i) =>
 						{
 							userInfo.friends.push(i.username);
-							console.log(userInfo);
+					//		console.log(userInfo);
 						});
+					io.sockets.on('connection',function(socket){
+						console.log(socket.connected);
+						console.log(username+" has connected.");
+					});
+				
 					return resp.send(userInfo);
 				});
 
-				console.log(userInfo);
+				//console.log(userInfo);
 					
 			});
 	});
 
 	console.log(userInfo);
 
-	// Socket shit to play with later
-	io.sockets.on('connection', function(socket) {
-		console.log('user has connected');
-	});
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 var server = app.listen(5000, function () {
    var host = server.address().address

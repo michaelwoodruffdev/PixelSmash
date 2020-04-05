@@ -34,7 +34,8 @@ class login extends React.Component {
     super(props)
     this.state = {
       username: '',
-      password: ''
+      password: '',
+	    users : []
     }
 
   }
