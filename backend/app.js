@@ -1,98 +1,153 @@
-// Import express module to create express app
-
-const express = require('express');
-
+// Import ExpressJS for backend
+var express = require('express');
 
 
 
 
-// Create express application
-
-const app = express();
 
 
 
 
-// Gets directory path
+// Here I will import the CryptoJS library
+// to encrypt the data that will be transferred 
+var crypto = require("crypto-js");
 
-const path = require('path');
-
-
-
-
-// Import body-parser for I guess
-// parsing information from the request body
-// that the app gets from the forms?
-
-const bodyParser = require('body-parser');
+// Create app
+var app = express();
 
 
 
 
-// Yeah, I don't know about this one
-// just bear with me
 
-const multer = require('multer');
-var upload = multer();
+// Import morgan package
+const logger = require('morgan');
 
 
 
 
-// Import mysql to send data to database
 
+
+// Import CORS to send data to and from frontend
+const cors = require('cors');
+
+
+
+
+
+
+var socketApp = require('http').createServer(function (req, res) {
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.write('Hello World!');
+  res.end()})
+  , io = require('socket.io').listen(socketApp)
+  , fs = require('fs')
+
+
+
+
+
+// This is necessary for sending data to web pages
+
+app.use(cors({
+        origin : 'http://18.222.189.77:3000',
+        credentials : true
+        })
+);
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({extended : false}));
+
+
+
+
+
+// As part of the authorization process I will tolkenize some
+// credentials using JSON Web Tokens, one thing needed for this is a header
+// which consists of the type of token, which for our case will be
+// JWT and the signing algorithm that will be used that could be RSA
+var header = {
+	"alg" : "HS256",
+	"typ" : "JWT"
+};
+
+
+
+// Import MySQLlibrary to fetch data
+// from database
 const mysql = require('mysql');
 
 
 
 
-// Sets up MySQL connection
 
+
+// Authentication data for database
 const connection = mysql.createConnection({
 
-	// Database server credentials
+        // Database server credentials
+
+        host : "localhost",
+        user : "pixeldev",
+        database : "pixel",
+        password : "12345"
+})
+
+
+
+
+
+
+
+
+// Users array
+var users = [];
+var query = "select * from user";
+
+
+// Here we get information of all users in the
+// database
+        connection.query(query, function(err,result,fields)
+        {
+                // Checks for error
+
+                if(err)throw(err);
+
+                // Checks if the list variable result is empty
+                // , if so then the user is not found
+
+                if(result.length == 0)
+                {
+        //              console.log(req.body);
+                        users =[];
+                }
+
+                else{
+                        console.log(result);
+
+                        users = result;
+
+                }
+        });
+
+
+
+
+
+
+
+
+var id = 0;
+
+
+
+// Send user data to login form for authentication
+
+app.get('/user_info', function(req,res) {
 	
-	host : "localhost",
-	user : "root",
-	database : "usersTest",
-	password : "12345"
-});
+return res.send(users);
 
-
-
-
-// When the user of the application sends form
-// data the data will be encoded, to extract the encoded data
-// the application will use express's urlencoded
-
-app.use(express.urlencoded());
-
-
-
-
-// for parsing application/json
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended : true }));
-app.use(upload.array());
-app.use(express.static('public'));
-
-
-
-
-
-// Displays login page where user logs in
-
-app.get('/', (req, res) => res.sendFile(path.join(__dirname+'/index.html')));
-
-
-
-
-
-
-
-// Sends user to html page for user creation
-
-app.get('/create_user', (req,res) => res.sendFile(path.join(__dirname+'/create.html')));
+})
 
 
 
@@ -102,49 +157,110 @@ app.get('/create_user', (req,res) => res.sendFile(path.join(__dirname+'/create.h
 
 
 
-// Validate user information
 
-app.post('/validate_user', (req,res) => {
 
-	console.log(req.body);
 
-	// Fetch user credentials from login for by getting
-	// username and password attributes from req.body
-	
-	var username = req.body.username;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Creates user and inserts user record to database
+app.post('/create_user', function(req,res) {
+
+	// Fetch user information
+	// from request body
+	var username = req.body.name;
+	var surname = req.body.surname;
 	var password = req.body.password;
+	var idUser = users.length + 1;
+	var email = req.body.email;
+	
+
+	// Store information in an object
+	
+	var userInfo = {
+		"username" : username,
+		"password" : password,
+		"surname" : surname,
+		"id" : idUser,
+		"email" : email
+	};
+
+
+
+
+
+
+
+	
+	// Encrypt user information
+	var encryptedUserInfo = crypto.AES.encrypt(JSON.stringify(req.body), 'secret key 123').toString();
 
 	
 
-	// Query for selecting records from database 
-	// with the username and password that were specified
-	// in the login form
+
+
 	
-	var query = "select * from userInfo where username = '"+username+"' and password = '"+password+"'";
-
-		
-	connection.query(query, function(err,result,fields)
-	{
-		// Checks for error
-
-		if(err)res.send("User was not found!");
-			
-		// Checks if the list variable result is empty
-		// , if so then the user is not found 
-
-		if(result.length == 0)res.send("User was not found!");
-			
-		else{
-			console.log(result);
 	
-			res.send("User found!");
+	// Decrypts user's information
+	
+	var decryptedUserInfo = crypto.AES.decrypt(JSON.stringify(encryptedUserInfo), 'secret key 123').toString()
+
+	
+
+
+
+
+
+
+
+
+	// This query will insert a new user as a new record to the table user
+	
+	var query = "insert into user values ('"+idUser+"','"+username+"','"+username+"','"+surname+"','"+email+"','"+password+"');";
+	
+
+
+
+
+
+
+
+
+
+
+
+	// Here the query will be run and we will check for a duplicate entry
+	connection.query(query, function(err,result){
+		if(err){
+			if(err.code == 'ER_DUP_ENTRY')console.log("User already exists");
+			else console.log("There was error");
 		}
+
+		else console.log("New user added successfully!");
 	});
 
-	
+
+
+
+
+
 });
 
+// Test
+app.get('/', function (req, res) {
+   res.send('Hello World');
+})
 
 
 
@@ -153,114 +269,132 @@ app.post('/validate_user', (req,res) => {
 
 
 
-// Create a new user
 
-app.post('/new_user', (req,res) => {
-	
-	console.log(req.body);
-	
-	//res.send(" Request succeeded");
-	// User Creation logic here
-	
-	
-	
-	// SQL query to insert user to userInfo table
-	// in usersTest database
-	
-	
-	
-	// Gets id of new user
-	
-	var i = 0;
 
-	
-	
-	// Gets new username
-	
-	var username = req.body.username;
-	
-	
-	
-	// Gets new password
-	
-	var password = req.body.password;
 
+
+
+
+
+
+
+
+
+
+app.post('/main',(req,resp)=>{
 	
 
+	// This secret variable will store the tokenized version of the object
+	var secret = "";
 	
-	
-	// Query for creating new users
-	
-	var query = "insert into userInfo values ('"+i+"','"+username+"','"+password+"');";
-	
-	console.log("Test");
 
-	
-	
-	
-	// Executes query
-	
-	connection.query(query, function(error, result) {
-		
-		console.log("Processing query");
 
-		// Checks for duplicate user
 
+	// This is the code that encrypts the user's information
+	secret = crypto.Rabbit.encrypt(JSON.stringify(req.body), 'secret key 123').toString();
+
+	console.log("Encrypted info :",secret);
+	var payload = JSON.parse(crypto.enc.Utf8.stringify(crypto.Rabbit.decrypt(secret, 'secret key 123')));
+	console.log("Decrypted info: ",payload);
+
+	var username = payload.username;
+
+	var sql = 'CALL getUserId("'+username+'")';
+	
+	var userInfo = {
+		username : username,
+		friends : []
+	};
+	connection.query(sql,true,(error,results,fields) => {
 		if(error)
-		{	
-				if(error.code ==='ER_DUP_ENTRY')res.send("User already exists!");
-				console.log("User could not be added because user already exists!");
-		//		throw error.code;
-				
-				// Catch error
-				
-				connection.on('error', function(error) {
+		{
+			console.error(error.message);
+		}
+
+		
+
+
+
+
+		// The previous stored procedure will only return 
+		// the id of the user that has logged so it will return one
+		// id, in the following code we will print to the console
+		// all the friends of the user
+
+		results[0].forEach((result) =>
+			{
+				// This console.log statement prints the id pertaining to the user with the
+				// given username
+				id = result.iduser;
+				console.log(`User id for `+username+` is `+id);
+
+				// Now we are getting the friends of this user using the 
+				// user's id and calling the stored procedure
+				// getFriends
+
+
+				var sql2 = "CALL getFriends("+id+")";
+//				console.log("The friends of "+username+" are");
+				connection.query(sql2,true,(err,res,param)=>{
 					
-					// I gues this prints the error
+					if(err)console.error(err.message);
+					
+					res[0].forEach((i) =>
+						{
+							userInfo.friends.push(i.username);
+					//		console.log(userInfo);
+						});
+					io.sockets.on('connection',function(socket){
+						console.log(socket.connected);
+						console.log(username+" has connected.");
+					});
+				
+					return resp.send(userInfo);
+				});
 
-					console.log("[mysql error]",error);
-				});	
-		}
-
-		else{
-			
-			// Message for successful query execution
-
-			res.send("New user added successfully");
-		}
-
+				//console.log(userInfo);
+					
+			});
 	});
-	
+
+	console.log(userInfo);
+
 });
 
 
-// socket testing
-app.get('/testing', (req, res) => {
-	res.status(200).send({ hello: "world" }).end();
-});
-
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
-io.on('connection', socket => {
-	socket.emit('connected');
-	console.log('new socket connected');
-
-	socket.on('hello', () => {
-		console.log('hello????');
-	});
-
-	socket.on('leftPressed', (fighterKey) => {
-		console.log('left is being pressed by ' + fighterKey);
-	});
-});
-
-
-// Port number is 3000
-
-const port = 8080;
 
 
 
-// Listening to port 3000 message
 
-http.listen(port, () => console.log(`Listening on port ${port} ...`));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var server = app.listen(5000, function () {
+   var host = server.address().address
+   var port = server.address().port
+   
+   console.log("Example app listening at http://%s:%s", host, port)
+})
+
