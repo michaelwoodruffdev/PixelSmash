@@ -54,14 +54,24 @@ class signup extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault()
-        console.log(this.state)     //print the form data to the console
-        axios.post('http://localhost:3001/validate_user', this.state)   //axios is an http api
-        .then(response => {
-        console.log(response)
-      })
-        .catch(error => {
-        console.log(error)
-      })
+	var userExists = false;
+	for(var i = 0; i <this.state.users.length;i++)
+	    {
+		    if(this.state.username == this.state.users[i].username && this.state.password == this.state.users[i].password)
+		    {
+			    console.log("User already exists");
+			    userExists = true;
+		    }
+	    }
+	    if(userExists == false)
+	    {
+	axios
+	    .post('http://18.222.189.77:5000/create_user',this.state)
+	    .then(()=> console.log("User was created"))
+	    .catch(err => {
+		console.log(err);
+	    });
+	    }
       }
 
     render(){
