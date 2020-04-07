@@ -18,6 +18,18 @@ class signup extends React.Component {
             password: ''
           }
     }
+    
+    componentDidMount(){
+                fetch('http://18.222.189.77:5000/user_info')
+                .then(res=> {
+                        console.log(res);
+                        return res.json();
+                })
+                .then(users=>{
+                        console.log(users);
+                        this.setState({ users })
+                });
+        }
 
     handleNameChange = (event) => {
         this.setState({
