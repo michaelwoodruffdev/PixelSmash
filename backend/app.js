@@ -247,7 +247,33 @@ app.post('/create_user', function(req,res) {
 			else console.log("There was error");
 		}
 
-		else console.log("New user added successfully!");
+		else {
+			 // Update user array after adding user
+                        query = "select * from user";
+                        connection.query(query, function(err,result,fields)
+                        {
+                                // Checks for error
+
+                                if(err)throw(err);
+
+                                 // Checks if the list variable result is empty
+                                // , if so then the user is not found
+
+                                if(result.length == 0)
+                                {
+                        //              console.log(req.body);
+                                        users =[];
+                                }
+
+                                else{
+                                        console.log(result);
+
+                                        users = result;
+
+                                }
+                        });
+
+		}
 	});
 
 
