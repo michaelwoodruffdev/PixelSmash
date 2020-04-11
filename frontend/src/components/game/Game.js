@@ -19,6 +19,10 @@ export default class Game extends React.Component {
         let { playerConfigs, stageConfig, controlConfigs } = props;
 
         this.onConnected = this.onConnected.bind(this);
+        this.onLeftHeard = this.onLeftHeard.bind(this);
+        this.onRightHeard = this.onRightHeard.bind(this);
+        this.onLeftRightRelease = this.onLeftRightRelease.bind(this);
+        this.onUpHeard = this.onUpHeard.bind(this);
 
         this.state = {
             unmounted: false,
@@ -31,6 +35,10 @@ export default class Game extends React.Component {
         console.log(this.context);
         let { playerConfigs, stageConfig, controlConfigs } = this.props;
         let context = this.context;
+        this.setState({
+            fighters: playerConfigs.map(pConf => new Fighter(pConf))
+        });
+        // this.state.fighters.forEach(fighter => fighter.loadSpritesheet());
         this.setState({
             game: {
                 width: 1200,
@@ -48,15 +56,24 @@ export default class Game extends React.Component {
                     }
                 },
                 scene: {
+                    extend: {
+                        component: this
+                    },
                     init: function () {
                         this.cameras.main.setBackgroundColor('#24252A');
 
                         // fighters initialization
-                        this.fighters = playerConfigs.map(pConf => new Fighter(pConf, this));
+                        console.log('trying to put fighters into state');
+                        console.log(this.component);
+
+                        // this.fighters = playerConfigs.map(pConf => new Fighter(pConf, this));
+                        this.component.state.fighters.forEach(f => f.setScene(this));
                     },
                     preload: function () {
                         // fighter assets
-                        this.fighters.forEach(fighter => fighter.loadSpritesheet());
+
+                        // this.fighters.forEach(fighter => fighter.loadSpritesheet());
+                        this.component.state.fighters.forEach(f => f.loadSpritesheet());
 
                         // load stage assets
                         this.load.image('background', stageConfig.assets.background);
@@ -81,11 +98,18 @@ export default class Game extends React.Component {
                         });
 
                         // fighters initialization
-                        for (let i = 0; i < this.fighters.length; i++) {
-                            this.fighters[i].addSprite(stageConfig.spawnLocations[i].x, stageConfig.spawnLocations[i].y);
-                            this.fighters[i].loadAnimations();
-                            this.fighters[i].addPlatformCollisions(this.passablePlatforms, this.impassablePlatforms);
-                            this.fighters[i].addControls(controlConfigs[i]);
+                        // for (let i = 0; i < this.fighters.length; i++) {
+                        //     this.fighters[i].addSprite(stageConfig.spawnLocations[i].x, stageConfig.spawnLocations[i].y);
+                        //     this.fighters[i].loadAnimations();
+                        //     this.fighters[i].addPlatformCollisions(this.passablePlatforms, this.impassablePlatforms);
+                        //     this.fighters[i].addControls(controlConfigs[i]);
+                        // }
+
+                        for (let i = 0; i < this.component.state.fighters.length; i++) {
+                            this.component.state.fighters[i].addSprite(stageConfig.spawnLocations[i].x, stageConfig.spawnLocations[i].y);
+                            this.component.state.fighters[i].loadAnimations();
+                            this.component.state.fighters[i].addPlatformCollisions(this.passablePlatforms, this.impassablePlatforms);
+                            this.component.state.fighters[i].addControls(controlConfigs[i]);
                         }
 
                         // input keys
@@ -99,13 +123,18 @@ export default class Game extends React.Component {
                         this.framesPassed += 1;
 
                         // handle fighters input and current animation state
-                        this.fighters.forEach(fighter => {
+                        this.component.state.fighters.forEach(fighter => {
+                            fighter.handleInput(context);
                             fighter.handleWalk(context);
                             fighter.checkMovementState();
                             fighter.checkDeath();
                         });
 
-                        handleCamera(this);
+                        // handleCamera(this);
+                        let fighters = this.component.state.fighters;
+                        this.cameras.cameras[0].scrollX = (((fighters[0].sprite.x + fighters[1].sprite.x) / 2) - this.cameras.cameras[0].centerX) / 5;
+                        this.cameras.cameras[0].scrollY = ((((fighters[0].sprite.y + fighters[1].sprite.y) / 2) - this.cameras.cameras[0].centerY) / 5) - 100;
+                        this.cameras.cameras[0].setZoom(1 - Math.abs(((fighters[0].sprite.x - fighters[1].sprite.x) / 3280)) - .1);
                     }
                 }
             }
@@ -114,6 +143,37 @@ export default class Game extends React.Component {
 
     onConnected() {
         console.log('heard socket');
+    }
+
+    onLeftHeard(fighterKey) {
+        console.log(`heard ${fighterKey} press left`);
+        let fighterToMove = this.state.fighters.find(f => f.config.fighterKey === fighterKey);
+        console.log(fighterToMove);
+        fighterToMove.moveLeft();
+        // console.log(this.state.fighters.find(f => f.config.fighterKey === fighterKey).moveLeft());
+    }
+
+    onRightHeard(fighterKey) {
+        console.log(`heard ${fighterKey} press right`);
+        let fighterToMove = this.state.fighters.find(f => f.config.fighterKey === fighterKey);
+        fighterToMove.moveRight();
+    }
+
+    onLeftRightRelease(fighterKey) {
+        if (this.state == null) {
+            return;
+        }
+        let fighterToStop = this.state.fighters.find(f => f.config.fighterKey === fighterKey);
+        fighterToStop.leftRightRelease();
+    }
+
+    onUpHeard(fighterKey) {
+        console.log('hello there?');
+        if (this.state == null) {
+            return;
+        }
+        let fighterToJump = this.state.fighters.find(f => f.config.fighterKey === fighterKey);
+        fighterToJump.tryToJump();
     }
 
     initializeGame = () => {
@@ -133,7 +193,10 @@ export default class Game extends React.Component {
                 {/* <button onClick={this.uninitializeGame}>stop</button> */}
 
                 {<IonPhaser game={game} initialize={initialize} />}
-                <Event event="connected" handler={this.onConnected} />
+                <Event event="leftHeard" handler={this.onLeftHeard} />
+                <Event event="rightHeard" handler={this.onRightHeard} />
+                <Event event="leftRightRelease" handler={this.onLeftRightRelease} />
+                <Event event="upHeard" handler={this.onUpHeard} />
             </div>
         );
     }

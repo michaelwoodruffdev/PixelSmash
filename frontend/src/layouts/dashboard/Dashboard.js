@@ -8,7 +8,7 @@ import wasdControls from '../../controlConfigs/wasd.js';
 import { Socket, SocketContext } from 'react-socket-io';
 
 function Dashboard() {
-  const uri = "http://localhost:8080";
+  const uri = "ec2-18-222-189-77.us-east-2.compute.amazonaws.com:5000";
 
   Game.contextType = SocketContext;
 
