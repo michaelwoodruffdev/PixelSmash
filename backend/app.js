@@ -18,7 +18,6 @@ var app = express();
 
 
 
-
 // Import morgan package
 const logger = require('morgan');
 
@@ -411,15 +410,19 @@ app.post('/main',(req,resp)=>{
 
 
 
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
 
+io.on('connection', function(socket) {
+	console.log('a user connected');
+});
 
-
-
-
-
-var server = app.listen(5000, function () {
-   var host = server.address().address
-   var port = server.address().port
-   
-   console.log("Example app listening at http://%s:%s", host, port)
-})
+http.listen(5000, function() {
+	console.log('listening on 5000');
+});
+//var server = app.listen(5000, function () {
+//   var host = server.address().address
+//   var port = server.address().port
+//   
+//   console.log("Example app listening at http://%s:%s", host, port)
+//})
