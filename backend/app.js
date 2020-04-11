@@ -47,12 +47,12 @@ var socketApp = require('http').createServer(function (req, res) {
 
 
 // This is necessary for sending data to web pages
-
-app.use(cors({
-        origin : 'http://18.222.189.77:3000',
-        credentials : true
-        })
-);
+app.use(cors());
+//app.use(cors({
+//        origin : 'http://18.222.189.77:3000',
+//        credentials : true
+//        })
+//);
 
 app.use(logger('dev'));
 app.use(express.json());
