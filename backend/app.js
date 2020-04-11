@@ -415,6 +415,37 @@ var io = require('socket.io')(http);
 
 io.on('connection', function(socket) {
 	console.log('a user connected');
+	
+	// input listening
+	socket.on('jumpPress', function() {
+		console.log('jump is being pressed');
+	});
+
+	socket.on('leftPress', function(fighterkey) {
+		console.log(`${fighterkey} pressed left key`);
+		socket.emit('leftHeard', fighterkey);
+		socket.broadcast.emit('leftHeard', fighterkey);
+	});
+
+	socket.on('rightPress', function(fighterkey) {
+		console.log(`${fighterkey} pressed right key`);
+		socket.emit('rightHeard', fighterkey);
+		socket.broadcast.emit('rightHeard', fighterkey);
+	});
+
+	socket.on('leftRightRelease', function(fighterkey) {
+		socket.emit('leftRightRelease', fighterkey);
+		socket.broadcast.emit('leftRightRelease', fighterkey);
+	});
+
+	socket.on('upPress', function(fighterkey) {
+		socket.emit('upHeard', fighterkey);
+		socket.broadcast.emit('upHeard', fighterkey);
+	});
+
+	socket.on('disconnect', function() {
+		console.log('a user disconnected');
+	});
 });
 
 http.listen(5000, function() {
