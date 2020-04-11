@@ -18,7 +18,6 @@ var app = express();
 
 
 
-
 // Import morgan package
 const logger = require('morgan');
 
@@ -411,15 +410,50 @@ app.post('/main',(req,resp)=>{
 
 
 
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
 
+io.on('connection', function(socket) {
+	console.log('a user connected');
+	
+	// input listening
+	socket.on('jumpPress', function() {
+		console.log('jump is being pressed');
+	});
 
+	socket.on('leftPress', function(fighterkey) {
+		console.log(`${fighterkey} pressed left key`);
+		socket.emit('leftHeard', fighterkey);
+		socket.broadcast.emit('leftHeard', fighterkey);
+	});
 
+	socket.on('rightPress', function(fighterkey) {
+		console.log(`${fighterkey} pressed right key`);
+		socket.emit('rightHeard', fighterkey);
+		socket.broadcast.emit('rightHeard', fighterkey);
+	});
 
+	socket.on('leftRightRelease', function(fighterkey) {
+		socket.emit('leftRightRelease', fighterkey);
+		socket.broadcast.emit('leftRightRelease', fighterkey);
+	});
 
+	socket.on('upPress', function(fighterkey) {
+		socket.emit('upHeard', fighterkey);
+		socket.broadcast.emit('upHeard', fighterkey);
+	});
 
-var server = app.listen(5000, function () {
-   var host = server.address().address
-   var port = server.address().port
-   
-   console.log("Example app listening at http://%s:%s", host, port)
-})
+	socket.on('disconnect', function() {
+		console.log('a user disconnected');
+	});
+});
+
+http.listen(5000, function() {
+	console.log('listening on 5000');
+});
+//var server = app.listen(5000, function () {
+//   var host = server.address().address
+//   var port = server.address().port
+//   
+//   console.log("Example app listening at http://%s:%s", host, port)
+//})
