@@ -413,34 +413,52 @@ app.post('/main',(req,resp)=>{
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 
+var lobbyNo = 1;
+var lobbies = {};
+
 io.on('connection', function(socket) {
-	console.log('a user connected');
+
+	// join lobby
+	if (io.nsps['/'].adapter.rooms["lobby-"+lobbyNo] && io.nsps['/'].adapter.rooms["lobby-"+lobbyNo].length > 1) lobbyNo++;
+	socket.join(`lobby-${lobbyNo}`);
+	io.in(`lobby-${lobbyNo}`).emit('connectHeard', lobbyNo);
+	if (!lobbies.hasOwnProperty(`lobby-${lobbyNo}`)) {
+		lobbies[`lobby-${lobbyNo}`] = {
+			gameStarted: false
+		};
+	}
 	
+	console.log('a user connected to lobby ' + lobbyNo);
+
 	// input listening
 	socket.on('jumpPress', function() {
 		console.log('jump is being pressed');
 	});
 
-	socket.on('leftPress', function(fighterkey) {
+	socket.on('leftPress', function(fighterkey, lobby) {
 		console.log(`${fighterkey} pressed left key`);
-		socket.emit('leftHeard', fighterkey);
-		socket.broadcast.emit('leftHeard', fighterkey);
+		io.in(`lobby-${lobby}`).emit('leftHeard', fighterkey);
+		//socket.emit('leftHeard', fighterkey);
+		//socket.broadcast.emit('leftHeard', fighterkey);
 	});
 
-	socket.on('rightPress', function(fighterkey) {
+	socket.on('rightPress', function(fighterkey, lobby) {
 		console.log(`${fighterkey} pressed right key`);
-		socket.emit('rightHeard', fighterkey);
-		socket.broadcast.emit('rightHeard', fighterkey);
+		io.in(`lobby-${lobby}`).emit('rightHeard', fighterkey);
+		//socket.emit('rightHeard', fighterkey);
+		//socket.broadcast.emit('rightHeard', fighterkey);
 	});
 
-	socket.on('leftRightRelease', function(fighterkey) {
-		socket.emit('leftRightRelease', fighterkey);
-		socket.broadcast.emit('leftRightRelease', fighterkey);
+	socket.on('leftRightRelease', function(fighterkey, lobby) {
+		io.in(`lobby-${lobby}`).emit('leftRightRelease', fighterkey);
+		//socket.emit('leftRightRelease', fighterkey);
+		//socket.broadcast.emit('leftRightRelease', fighterkey);
 	});
 
-	socket.on('upPress', function(fighterkey) {
-		socket.emit('upHeard', fighterkey);
-		socket.broadcast.emit('upHeard', fighterkey);
+	socket.on('upPress', function(fighterkey, lobby) {
+		io.in(`lobby-${lobby}`).emit('upHeard', fighterkey);
+		//socket.emit('upHeard', fighterkey);
+		//socket.broadcast.emit('upHeard', fighterkey);
 	});
 
 	socket.on('disconnect', function() {
