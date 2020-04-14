@@ -1,8 +1,7 @@
 class Fighter {
-    // constructor
-    constructor(characterObject, scene) {
+
+    constructor(characterObject) {
         // members
-        this.scene = scene;
 
         this.sprite = null;
         this.isFalling = true;
@@ -10,12 +9,18 @@ class Fighter {
         this.config = characterObject;
         this.config.fighterKey += 'sampleusername';
 
+        this.isLeftOrRightDown = false;
+
         this.velocityX = 0;
 
         this.jumpCount = 1;
         this.isMidair = true;
 
         this.deathCount = 0;
+    }
+
+    setScene(scene) {
+        this.scene = scene;
     }
 
     // loading spritesheet data
@@ -48,6 +53,7 @@ class Fighter {
         this.isMidair = false;
         this.isFalling = false;
         this.jumpCount = 0;
+        this.velocityX = 0;
         this.sprite.anims.play(this.config.fighterKey + 'idle');
     }
 
@@ -82,65 +88,86 @@ class Fighter {
         this.downKey = this.scene.input.keyboard.addKey(controls.keys.down);
         this.leftKey = this.scene.input.keyboard.addKey(controls.keys.left);
         this.rightKey = this.scene.input.keyboard.addKey(controls.keys.right);
+    }
 
-        this.jumpKey = this.scene.input.keyboard.addKey(controls.keys.jump);
-        this.jumpKey.isPressedWithoutRelease = false;
-        this.jumpKey.on('down', (event) => {
-            if (!this.jumpKey.isPressedWithoutRelease && this.jumpCount < 2) {
-                // jump key was pressed
-                this.jumpKey.isPressedWithoutRelease = true;
-                // first jump
-                if (this.jumpCount === 0) {
-                    this.sprite.setVelocityY(this.config.jumpHeights.first);
-                    this.sprite.anims.play(this.config.fighterKey + 'firstjump');
-                }
-                // double jump
-                else if (this.jumpCount === 1) {
-                    this.sprite.setVelocityY(this.config.jumpHeights.second);
-                    this.sprite.anims.play(this.config.fighterKey + 'secondjump');
-                }
-                this.jumpCount += 1;
-                this.isFalling = false;
-                this.isWalking = false;
-                this.isMidair = true;
+    // handle input
+    handleInput(socketContext, lobbyNo) {
+        if (this.leftKey.isDown) {
+            this.isLeftOrRightDown = true;
+            socketContext.emit('leftPress', this.config.fighterKey, lobbyNo);
+        } 
+        else if (this.rightKey.isDown) {
+            this.isLeftOrRightDown = true;
+            socketContext.emit('rightPress', this.config.fighterKey, lobbyNo);
+        }
+        else if (this.isLeftOrRightDown) {
+            socketContext.emit('leftRightRelease', this.config.fighterKey, lobbyNo);
+            this.isLeftOrRightDown = false;
+        }
+
+        if (this.upKey.isDown && !this.isUpKeyDownWithoutRelease) {
+            socketContext.emit('upPress', this.config.fighterKey, lobbyNo);
+            this.isUpKeyDownWithoutRelease = true;
+        }
+        if (!this.upKey.isDown && this.isUpKeyDownWithoutRelease) {
+            this.isUpKeyDownWithoutRelease = false;
+        }
+    }
+
+    tryToJump() {
+        console.log(this.jumpCount);
+        // first jump
+        if (this.jumpCount === 0) {
+            console.log('firstJump');
+            this.sprite.setVelocityY(this.config.jumpHeights.first);
+            this.sprite.anims.play(this.config.fighterKey + 'firstjump');
+        }
+        // double jump
+        else if (this.jumpCount === 1) {
+            console.log('secondJump');
+            this.sprite.setVelocityY(this.config.jumpHeights.second);
+            this.sprite.anims.play(this.config.fighterKey + 'secondjump');
+        }
+        this.jumpCount += 1;
+        this.isFalling = false;
+        this.isWalking = false;
+        this.isMidair = true;
+    }
+
+    // handle left movement
+    moveLeft() {
+        if (this.sprite.body.onFloor()) {
+            this.velocityX = -this.config.movementSpeed;
+        } else {
+            if (this.velocityX > -200) {
+                this.velocityX -= 70;
             }
-        });
-        this.jumpKey.on('up', (event) => {
-            if (this.jumpKey.isPressedWithoutRelease) {
-                this.jumpKey.isPressedWithoutRelease = false;
+        }
+    }
+
+    // handle right movement
+    moveRight() {
+        if (this.sprite.body.onFloor()) {
+            this.velocityX = this.config.movementSpeed;
+        } else {
+            if (this.velocityX < 200) {
+                this.velocityX += 70;
             }
-        });
+        }
+        // this.sprite.setVelocityX(this.velocityX);
+    }
+
+    leftRightRelease() {
+        if (this.sprite == null) {
+            return;
+        }
+        if (this.sprite.body.onFloor()) {
+            this.velocityX = 0;
+        }
     }
 
     // handle input each frame
     handleWalk(socketcontext) {
-        // left key input
-        if (this.leftKey.isDown) {
-            socketcontext.emit('leftPressed', this.config.fighterKey);
-            if (this.sprite.body.onFloor()) {
-                this.velocityX = -this.config.movementSpeed;
-            } else {
-                if (this.velocityX > -200) {
-                    this.velocityX -= 70;
-                }
-            }
-        }
-        // right key input
-        else if (this.rightKey.isDown) {
-            if (this.sprite.body.onFloor()) {
-                this.velocityX = this.config.movementSpeed;
-            } else {
-                if (this.velocityX < 200) {
-                    this.velocityX += 70;
-                }
-            }
-        }
-        // no left or right input
-        else {
-            if (this.sprite.body.onFloor()) {
-                this.velocityX = 0;
-            }
-        }
         this.sprite.setVelocityX(this.velocityX);
     }
 
