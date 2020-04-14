@@ -91,27 +91,27 @@ class Fighter {
     }
 
     // handle input
-    handleInput(socketContext) {
+    handleInput(socketContext, lobbyNo) {
         if (this.leftKey.isDown) {
             this.isLeftOrRightDown = true;
-            socketContext.emit('leftPress', this.config.fighterKey);
+            socketContext.emit('leftPress', this.config.fighterKey, lobbyNo);
         } 
         else if (this.rightKey.isDown) {
             this.isLeftOrRightDown = true;
-            socketContext.emit('rightPress', this.config.fighterKey);
+            socketContext.emit('rightPress', this.config.fighterKey, lobbyNo);
         }
         else if (this.isLeftOrRightDown) {
             console.log('hello?');
-            socketContext.emit('leftRightRelease', this.config.fighterKey);
+            socketContext.emit('leftRightRelease', this.config.fighterKey, lobbyNo);
             this.isLeftOrRightDown = false;
         }
 
         if (this.upKey.isDown && !this.isUpKeyDownWithoutRelease) {
             console.log('true upkey');
-            socketContext.emit('upPress', this.config.fighterKey);
+            socketContext.emit('upPress', this.config.fighterKey, lobbyNo);
             this.isUpKeyDownWithoutRelease = true;
         }
-        if (!this.upKey.isDown && this.isUpKeyDownWithoutRelease) {
+        if (!this.upKey.isDown && this.isUpKeyDownWithoutRelease, lobbyNo) {
             this.isUpKeyDownWithoutRelease = false;
         }
     }

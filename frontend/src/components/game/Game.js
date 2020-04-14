@@ -23,6 +23,7 @@ export default class Game extends React.Component {
         this.onRightHeard = this.onRightHeard.bind(this);
         this.onLeftRightRelease = this.onLeftRightRelease.bind(this);
         this.onUpHeard = this.onUpHeard.bind(this);
+        this.onConnectHeard = this.onConnectHeard.bind(this);
 
         this.state = {
             unmounted: false,
@@ -124,7 +125,7 @@ export default class Game extends React.Component {
 
                         // handle fighters input and current animation state
                         this.component.state.fighters.forEach(fighter => {
-                            fighter.handleInput(context);
+                            fighter.handleInput(context, this.component.state.lobbyNo);
                             fighter.handleWalk(context);
                             fighter.checkMovementState();
                             fighter.checkDeath();
@@ -176,13 +177,17 @@ export default class Game extends React.Component {
         fighterToJump.tryToJump();
     }
 
+    onConnectHeard(lobbyNo) {
+        this.setState({ lobbyNo: lobbyNo });
+    }
+
     initializeGame = () => {
-        this.setState({ initialize: true })
+        this.setState({ initialize: true });
     }
 
     uninitializeGame = () => {
-        this.setState({ unmounted: true })
-        this.setState({ initialize: false })
+        this.setState({ unmounted: true });
+        this.setState({ initialize: false });
     }
 
     render() {
@@ -197,6 +202,7 @@ export default class Game extends React.Component {
                 <Event event="rightHeard" handler={this.onRightHeard} />
                 <Event event="leftRightRelease" handler={this.onLeftRightRelease} />
                 <Event event="upHeard" handler={this.onUpHeard} />
+                <Event event="connectHeard" handler={this.onConnectHeard} />
             </div>
         );
     }
