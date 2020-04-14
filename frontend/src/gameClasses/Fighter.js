@@ -91,24 +91,22 @@ class Fighter {
     }
 
     // handle input
-    handleInput(socketContext) {
+    handleInput(socketContext, lobbyNo) {
         if (this.leftKey.isDown) {
             this.isLeftOrRightDown = true;
-            socketContext.emit('leftPress', this.config.fighterKey);
+            socketContext.emit('leftPress', this.config.fighterKey, lobbyNo);
         } 
         else if (this.rightKey.isDown) {
             this.isLeftOrRightDown = true;
-            socketContext.emit('rightPress', this.config.fighterKey);
+            socketContext.emit('rightPress', this.config.fighterKey, lobbyNo);
         }
         else if (this.isLeftOrRightDown) {
-            console.log('hello?');
-            socketContext.emit('leftRightRelease', this.config.fighterKey);
+            socketContext.emit('leftRightRelease', this.config.fighterKey, lobbyNo);
             this.isLeftOrRightDown = false;
         }
 
         if (this.upKey.isDown && !this.isUpKeyDownWithoutRelease) {
-            console.log('true upkey');
-            socketContext.emit('upPress', this.config.fighterKey);
+            socketContext.emit('upPress', this.config.fighterKey, lobbyNo);
             this.isUpKeyDownWithoutRelease = true;
         }
         if (!this.upKey.isDown && this.isUpKeyDownWithoutRelease) {
@@ -117,14 +115,16 @@ class Fighter {
     }
 
     tryToJump() {
-        console.log('hello');
+        console.log(this.jumpCount);
         // first jump
         if (this.jumpCount === 0) {
+            console.log('firstJump');
             this.sprite.setVelocityY(this.config.jumpHeights.first);
             this.sprite.anims.play(this.config.fighterKey + 'firstjump');
         }
         // double jump
         else if (this.jumpCount === 1) {
+            console.log('secondJump');
             this.sprite.setVelocityY(this.config.jumpHeights.second);
             this.sprite.anims.play(this.config.fighterKey + 'secondjump');
         }
@@ -136,9 +136,7 @@ class Fighter {
 
     // handle left movement
     moveLeft() {
-        console.log(1);
         if (this.sprite.body.onFloor()) {
-            console.log(2);
             this.velocityX = -this.config.movementSpeed;
         } else {
             if (this.velocityX > -200) {
