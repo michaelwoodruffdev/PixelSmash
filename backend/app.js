@@ -418,60 +418,68 @@ var lobbies = {};
 
 io.on('connection', function(socket) {
 
-	// join lobby
+	// join / create lobby 
+	
+	// increment lobby number (create new lobby) if needed
 	if (io.nsps['/'].adapter.rooms["lobby-"+lobbyNo] && io.nsps['/'].adapter.rooms["lobby-"+lobbyNo].length > 1) lobbyNo++;
+	// join lobby
 	socket.join(`lobby-${lobbyNo}`);
+	socket.lobbyNo = lobbyNo;
 	io.in(`lobby-${lobbyNo}`).emit('connectHeard', lobbyNo);
 	if (!lobbies.hasOwnProperty(`lobby-${lobbyNo}`)) {
 		lobbies[`lobby-${lobbyNo}`] = {
-			gameStarted: false
+			gameStarted: false, 
+			playerCount: 1
 		};
+		socket.emit('hostConnectHeard');
+	} else {
+		io.in(`lobby-${lobbyNo}`).emit('gameStart');
+		lobbies[`lobby-${lobbyNo}`].playerCount++;
+		lobbies[`lobby-${lobbyNo}`].gameStarted = true;
 	}
-	
 	console.log('a user connected to lobby ' + lobbyNo);
 
 	// input listening
-	socket.on('jumpPress', function() {
-		console.log('jump is being pressed');
-	});
-
 	socket.on('leftPress', function(fighterkey, lobby) {
-		console.log(`${fighterkey} pressed left key`);
 		io.in(`lobby-${lobby}`).emit('leftHeard', fighterkey);
-		//socket.emit('leftHeard', fighterkey);
-		//socket.broadcast.emit('leftHeard', fighterkey);
 	});
 
 	socket.on('rightPress', function(fighterkey, lobby) {
-		console.log(`${fighterkey} pressed right key`);
 		io.in(`lobby-${lobby}`).emit('rightHeard', fighterkey);
-		//socket.emit('rightHeard', fighterkey);
-		//socket.broadcast.emit('rightHeard', fighterkey);
 	});
 
 	socket.on('leftRightRelease', function(fighterkey, lobby) {
 		io.in(`lobby-${lobby}`).emit('leftRightRelease', fighterkey);
-		//socket.emit('leftRightRelease', fighterkey);
-		//socket.broadcast.emit('leftRightRelease', fighterkey);
 	});
 
 	socket.on('upPress', function(fighterkey, lobby) {
 		io.in(`lobby-${lobby}`).emit('upHeard', fighterkey);
-		//socket.emit('upHeard', fighterkey);
-		//socket.broadcast.emit('upHeard', fighterkey);
 	});
 
+	// triggered by player1 if player2 leaves and visa-verca
+	socket.on('manualDisconnect', function() {
+		socket.disconnect();
+	});
+
+	// host triggers syncronize every once in a while
+	socket.on('hostUpdate', function(updateObj) {
+		io.in(`lobby-${updateObj.lobbyNo}`).emit('syncFighters', updateObj);
+	});
+
+
+	// clean up lobbies on disconnection
 	socket.on('disconnect', function() {
-		console.log('a user disconnected');
+		console.log(`a user disconnected from lobby-${socket.lobbyNo}`);
+		lobbies[`lobby-${socket.lobbyNo}`].playerCount--;
+		if (lobbies[`lobby-${socket.lobbyNo}`].playerCount == 1) {
+			io.in(`lobby-${lobbyNo}`).emit('playerDisconnect');
+		} else if (lobbies[`lobby-${socket.lobbyNo}`].playerCount === 0) {
+			delete lobbies[`lobby-${socket.lobbyNo}`];
+		}
 	});
 });
 
 http.listen(5000, function() {
 	console.log('listening on 5000');
 });
-//var server = app.listen(5000, function () {
-//   var host = server.address().address
-//   var port = server.address().port
-//   
-//   console.log("Example app listening at http://%s:%s", host, port)
-//})
+
