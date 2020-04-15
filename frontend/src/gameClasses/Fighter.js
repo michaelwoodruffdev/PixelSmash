@@ -1,13 +1,13 @@
 class Fighter {
 
-    constructor(characterObject) {
+    constructor(characterObject, username) {
         // members
 
         this.sprite = null;
         this.isFalling = true;
         this.isWalking = false;
         this.config = characterObject;
-        this.config.fighterKey += 'sampleusername';
+        this.config.fighterKey += username;
 
         this.isLeftOrRightDown = false;
 
