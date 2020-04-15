@@ -23,12 +23,15 @@ export default class Game extends React.Component {
         this.onGameStart = this.onGameStart.bind(this);
         this.onPlayerDisconnect = this.onPlayerDisconnect.bind(this);
         this.onSyncFighters = this.onSyncFighters.bind(this);
+        this.onSyncFighterHeard = this.onSyncFighterHeard.bind(this);
+        this.onLatencyPong = this.onLatencyPong.bind(this);
 
         // root state initialization
         this.state = {
             unmounted: false,
             initialize: false,
-            game: null
+            game: null,
+            playerKey: 'billnbobsampleusername'
         }
     }
 
@@ -43,8 +46,18 @@ export default class Game extends React.Component {
             fightersToStoreInState[`${pConf.fighterKey}sampleusername`] = new Fighter(pConf, 'sampleusername');
         });
         this.setState({
-            fighterMap: fightersToStoreInState, 
-            isHost: false
+            fighterMap: fightersToStoreInState,
+            isHost: false,
+            latency: 0,
+            latencyPingTimer: 0
+        });
+
+        // latency timer
+        this.setState({
+            latencyTimerId: setInterval(() => {
+                this.setState({ latencyPingTimer: Date.now() });
+                context.emit('latencyPing');
+            }, 2000)
         });
 
         // main phaser game setup
@@ -105,15 +118,16 @@ export default class Game extends React.Component {
                         // this will actually instantiate fighters in the scene and make them interactable
                         let i = 0;
                         let fighterMapp = this.component.state.fighterMap;
+                        // console.log(this.component.state.playerKey);
                         Object.keys(fighterMapp).forEach((key) => {
                             fighterMapp[key].addSprite(stageConfig.spawnLocations[i].x, stageConfig.spawnLocations[i].y);
                             fighterMapp[key].loadAnimations();
-                            fighterMapp[key].addPlatformCollisions(this.passablePlatforms, this.impassablePlatforms);
-                            fighterMapp[key].addControls(controlConfigs[i]);
+                            fighterMapp[key].addPlatformCollisions(this.passablePlatforms, this.impassablePlatforms, context, this.component.state.playerKey, this.component.state.lobbyNo);
                             i++;
                         });
+                        fighterMapp[this.component.state.playerKey].addControls(controlConfigs[0]);
 
-                        this.physics.world.setFPS(60);
+                        this.physics.world.setFPS(30);
                         this.cameras.cameras[0].fadeIn(1000);
                     },
                     update: function () {
@@ -123,30 +137,28 @@ export default class Game extends React.Component {
 
                         var fighterMap = this.component.state.fighterMap;
 
-                        // if (this.framesPassed === 300) {
-                        //     this.framesPassed = 0;
-                        //     if (this.component.state.isHost === true) {
-                        //         context.emit('hostUpdate', {
-                        //             player1: {
-                        //                 x: this.component.state.fighters[0].sprite.x, 
-                        //                 y: this.component.state.fighters[0].sprite.y
-                        //             }, 
-                        //             player2: {
-                        //                 x: this.component.state.fighters[1].sprite.x, 
-                        //                 y: this.component.state.fighters[1].sprite.y
-                        //             }, 
-                        //             lobbyNo: this.component.state.lobbyNo
-                        //         })
-                        //     }
-                        // }
+                        if (this.framesPassed === 30) {
+                            this.framesPassed = 0;
+                            if (this.component.state.fighterMap[this.component.state.playerKey].sprite.body.onFloor()) {
+                                context.emit('syncFighter',
+                                    {
+                                        fighterKey: this.component.state.playerKey,
+                                        x: fighterMap[this.component.state.playerKey].sprite.x,
+                                        y: fighterMap[this.component.state.playerKey].sprite.y
+                                    },
+                                    this.component.state.lobbyNo
+                                );
+                            }
+                        }
 
                         // handle fighters input and current animation state
+                        fighterMap[this.component.state.playerKey].handleInput(context, this.component.state.lobbyNo);
                         Object.keys(fighterMap).forEach(key => {
-                            fighterMap[key].handleInput(context, this.component.state.lobbyNo);
                             fighterMap[key].handleWalk(context);
                             fighterMap[key].checkMovementState();
                             fighterMap[key].checkDeath();
                         });
+
 
                         this.component.handleCamera(this.cameras.cameras[0]);
                     }
@@ -155,12 +167,16 @@ export default class Game extends React.Component {
         })
     }
 
+    componentWillUnmount() {
+        clearInterval(this.state.latencyTimerId);
+    }
+
     handleCamera(camera) {
-        let centerBetweenFighters = {x: 0, y: 0};
+        let centerBetweenFighters = { x: 0, y: 0 };
         let extremes = {
-            minX: 10000, 
-            maxX: -10000, 
-            minY: 10000, 
+            minX: 10000,
+            maxX: -10000,
+            minY: 10000,
             maxY: -10000
         };
         Object.keys(this.state.fighterMap).forEach(key => {
@@ -171,7 +187,7 @@ export default class Game extends React.Component {
                 extremes.minX = currentFighterSprite.x;
             }
             if (currentFighterSprite.x > extremes.maxX) {
-        // camera.setZoom(desiredZoom);  
+                // camera.setZoom(desiredZoom);  
                 extremes.maxX = currentFighterSprite.x;
             }
             if (currentFighterSprite.y < extremes.minY) {
@@ -181,11 +197,11 @@ export default class Game extends React.Component {
                 extremes.maxY = currentFighterSprite.y;
             }
         });
-        let rangeOfPositions = {x: extremes.maxX - extremes.minX, y: extremes.maxY - extremes.minY};
+        let rangeOfPositions = { x: extremes.maxX - extremes.minX, y: extremes.maxY - extremes.minY };
         centerBetweenFighters.x /= Object.keys(this.state.fighterMap).length;
         centerBetweenFighters.y /= Object.keys(this.state.fighterMap).length;
-        let center = {x: camera.centerX, y: camera.centerY};
-        let differenceOfCenters = {x: centerBetweenFighters.x - center.x, y: centerBetweenFighters.y - center.y};
+        let center = { x: camera.centerX, y: camera.centerY };
+        let differenceOfCenters = { x: centerBetweenFighters.x - center.x, y: centerBetweenFighters.y - center.y };
         let cameraSpeed = 20;
         let desiredX = differenceOfCenters.x / 2;
         camera.scrollX += (desiredX - camera.scrollX) / cameraSpeed;
@@ -196,7 +212,7 @@ export default class Game extends React.Component {
     }
 
     onConnected() {
-        console.log('heard socket');
+        // console.log('heard socket');
     }
 
     onLeftHeard(fighterKey) {
@@ -226,7 +242,10 @@ export default class Game extends React.Component {
     }
 
     onHostConnectHeard() {
-        this.setState({ isHost: true });
+        this.setState({
+            isHost: true,
+            playerKey: 'dhonusampleusername'
+        });
     }
 
     onGameStart() {
@@ -242,6 +261,22 @@ export default class Game extends React.Component {
         this.state.fighters[0].sprite.setY(updateObj.player1.y);
         this.state.fighters[1].sprite.setX(updateObj.player2.x);
         this.state.fighters[1].sprite.setY(updateObj.player2.y);
+    }
+
+    onSyncFighterHeard(position, fighterKey) {
+        // console.log(Math.abs(this.state.fighterMap[fighterKey].sprite.x - position.x));
+        // console.log(Math.abs(this.state.fighterMap[fighterKey].sprite.y - position.y));
+
+        if (Math.abs(this.state.fighterMap[fighterKey].sprite.x - position.x) > 50 || Math.abs(this.state.fighterMap[fighterKey].sprite.y - position.y) > 50) {
+            console.log('should resync');
+            this.state.fighterMap[fighterKey].sprite.setX(position.x);
+            this.state.fighterMap[fighterKey].sprite.setY(position.y);
+        }
+    }
+
+    onLatencyPong() {
+        this.setState({ latency: Date.now() - this.state.latencyPingTimer });
+        // console.log(this.state.latency);
     }
 
     initializeGame = () => {
@@ -270,6 +305,8 @@ export default class Game extends React.Component {
                 <Event event="gameStart" handler={this.onGameStart} />
                 <Event event="playerDisconnect" handler={this.onPlayerDisconnect} />
                 <Event event="syncFighters" handler={this.onSyncFighters} />
+                <Event event="syncFighterHeard" handler={this.onSyncFighterHeard} />
+                <Event event="latencyPong" handler={this.onLatencyPong} />
             </div>
         );
     }
