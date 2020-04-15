@@ -466,6 +466,14 @@ io.on('connection', function(socket) {
 		io.in(`lobby-${updateObj.lobbyNo}`).emit('syncFighters', updateObj);
 	});
 
+	socket.on('syncFighter', function(updateObj, lobbyNo) {
+		socket.to(`lobby-${lobbyNo}`).emit('syncFighterHeard', updateObj, updateObj.fighterKey);
+	});
+
+	socket.on('latencyPing', function() {
+		socket.emit('latencyPong');
+	});
+
 
 	// clean up lobbies on disconnection
 	socket.on('disconnect', function() {
