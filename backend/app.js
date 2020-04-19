@@ -63,6 +63,7 @@ const connection = mysql.createConnection({
 
 // Users array
 var users = [];
+var nextUserId = -1;
 var query = "select * from user";
 
 
@@ -83,7 +84,9 @@ var query = "select * from user";
                 else{
                         console.log(result);
                         users = result;
-                }
+			nextUserId = users.length + 1;
+		}
+
         });
 
 var id = 0;
@@ -93,6 +96,28 @@ var id = 0;
 // Send user data to login form for authentication
 app.get('/user_info', function(req,res) {
 	return res.send(users);
+});
+
+//const { v4: uuidv4 } = require('uuid');
+
+app.post('/signup', (req, res) => {
+	let signupQuery = `insert into user values ("${nextUserId++}", "${req.body.username}", "${req.body.username}", "${req.body.username}", "${req.body.email}", "${req.body.password}");`;
+
+	connection.query(signupQuery, function(err, result) {
+		if(err) {
+			console.log(err.code);
+			if (err.code === 'ER_DUP_ENTRY') {
+				res.status(409).end();
+				return;
+			} else {
+				res.status(500).end();
+				return;
+			}
+		} 
+		res.status(200).end();
+		return;
+	});
+	return;
 });
 
 
@@ -248,6 +273,7 @@ const verifyToken = (token) => {
 
 app.post('/signin', (req, res) => {
 	// attempt to find user with username and password, if found, sign token and send in response
+	console.log(req.body);
 	let signinQuery = `select * from user where username = "${req.body.username}" and password = "${req.body.password}";`;
 	connection.query(signinQuery, true, (error, results, fields) => {
 		if (error) {
