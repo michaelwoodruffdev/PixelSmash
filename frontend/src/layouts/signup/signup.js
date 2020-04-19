@@ -9,143 +9,151 @@ import axios from 'axios';
 // import logo from './logo.png';
 
 class signup extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            name: '',
-            surename:'',
-            email:'',
-            password: ''
-          }
+  constructor(props) {
+    super(props)
+    this.state = {
+      username: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
     }
+  }
+
+  handleUsernameChange = (event) => {
+    this.setState({
+      username: event.target.value
+    })
+  }
+  handleEmailChange = (event) => {
+    this.setState({
+      email: event.target.value
+    })
+  }
+  handlePasswordChange = (event) => {
+    this.setState({
+      password: event.target.value
+    })
+  }
+  handleConfirmPasswordChange = (event) => {
+    this.setState({
+      confirmPassword: event.target.value
+    })
+  }
+
+  handleSubmit = (event) => {
+    event.preventDefault()
+    if (this.state.password !== this.state.confirmPassword) {
+      window.alert("passwords don't match");
+      return;
+    }
+
+    let requestObject = {
+      username: this.state.username, 
+      password: this.state.password, 
+      email: this.state.email
+    }
+
+    fetch("http://ec2-18-222-189-77.us-east-2.compute.amazonaws.com:5000/create_user", {
+      method: "POST", 
+      data: JSON.stringify(requestObject), 
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(res => {
+      console.log(res.status);
+      if (res.status === 409) {
+        window.alert("user with that username already exists");
+        return null;
+      } else if (res.status === 500) {
+        window.alert("server error");
+        return null;
+      } else {
+        window.alert("user created");
+        this.props.history.push('/login');
+        return;
+      }
+    });
     
-    componentDidMount(){
-                fetch('http://18.222.189.77:5000/user_info')
-                .then(res=> {
-                        console.log(res);
-                        return res.json();
-                })
-                .then(users=>{
-                        console.log(users);
-                        this.setState({ users })
-                });
-        }
+  }
 
-    handleNameChange = (event) => {
-        this.setState({
-          name: event.target.value
-        })
-      }
-      handleSurnameChange = (event) => {
-        this.setState({
-          surename: event.target.value
-        })
-      }
-      handleEmailChange = (event) => {
-        this.setState({
-          email: event.target.value
-        })
-      }
-      handlePasswordChange = (event) => {
-        this.setState({
-          password: event.target.value
-        })
-      }
-
-    handleSubmit = (event) => {
-        event.preventDefault()
-	var userExists = false;
-	for(var i = 0; i <this.state.users.length;i++)
-	    {
-		    if(this.state.username == this.state.users[i].username && this.state.password == this.state.users[i].password)
-		    {
-			    console.log("User already exists");
-			    userExists = true;
-		    }
-	    }
-	    if(userExists == false)
-	    {
-	axios
-	    .post('http://18.222.189.77:5000/create_user',this.state)
-	    .then(()=> console.log("User was created"))
-	    .catch(err => {
-		console.log(err);
-	    });
-	    }
-      }
-
-    render(){
-        return(
-        // <BodyBackgroundColor backgroundColor = '#FF00F'>
-        <div className="container">
+  render() {
+    return (
+      // <BodyBackgroundColor backgroundColor = '#FF00F'>
+      <div className="container">
         {/* <Infobar/> */}
-        <img src='https://www.freelogodesign.org/file/app/client/thumb/bf970f3b-3d14-44fc-b851-5b99674b0139_200x200.png?1581994698035'  width="150" height="100" alt='Logo'/>
+        <img src='https://www.freelogodesign.org/file/app/client/thumb/bf970f3b-3d14-44fc-b851-5b99674b0139_200x200.png?1581994698035' width="150" height="100" alt='Logo' />
         <Card className="card">
-            <CardContent>
+          <CardContent>
             <form onSubmit={this.handleSubmit}>
-                <div id="textfields">
-                    <div id="names">
-                    <TextField 
-                    required
-                    id="outlined-required"
-                    label="Name"
-                    defaultValue="Name"
-                    variant="outlined"
-                    value={this.state.name} 
-                    onChange={this.handleNameChange}
-                    className="name" 
-                    />
-                    {" "}
-                    <TextField 
-                    required
-                    id="outlined-required"
-                    label="Surname"
-                    //defaultValue="Surname"
-                    variant="outlined"
-                    value={this.state.surname} 
-                    onChange={this.handleSurnameChange} 
-                    className="surname"
-                    />
-                    </div>
-                    
-                    <br></br>
-                    <TextField 
-                    required
-                    id="outlined-required"
-                    label="Email "
-                    defaultValue="Email"
-                    variant="outlined"
-                    value={this.state.email} 
-                    onChange={this.handleEmailChange} 
-                    className="email"
-                    />
+              <div id="textfields">
+                <TextField
+                  required
+                  id="outlined-required"
+                  label="username"
+                  defaultValue=""
+                  variant="outlined"
+                  value={this.state.name}
+                  onChange={this.handleUsernameChange}
+                  className="name"
+                />
 
-                    <br></br><br></br>
-                    <TextField 
-                    required
-                    id="outlined-required"
-                    label="Password"
-                    defaultValue="Password"
-                    type="password"
-                    variant="outlined"
-                    value={this.state.password}
-                    onChange={this.handlePasswordChange}
-                    className="password"
-                    />
-                    <br></br>
-                </div>
-                <Button variant="contained"  type="submit" id="create">
-                    Create Account
+                <br></br><br></br>
+                <TextField
+                  required
+                  id="outlined-required"
+                  label="email "
+                  defaultValue=""
+                  variant="outlined"
+                  value={this.state.email}
+                  onChange={this.handleEmailChange}
+                  className="email"
+                />
+
+                <br></br><br></br>
+                <TextField
+                  required
+                  id="outlined-required"
+                  label="Password"
+                  defaultValue="Password"
+                  type="password"
+                  variant="outlined"
+                  value={this.state.password}
+                  onChange={this.handlePasswordChange}
+                  className="password"
+                />
+                <br></br><br></br>
+                <TextField
+                  required
+                  id="outlined-required"
+                  label="confirm password"
+                  defaultValue=""
+                  type="password"
+                  variant="outlined"
+                  value={this.state.confirmPassword}
+                  onChange={this.handleConfirmPasswordChange}
+                  className="password"
+                />
+                <br></br>
+              </div>
+              <div className="buttons">
+                <Button variant="contained" id="back">
+                  Back
                 </Button>
+                <Button variant="contained" type="submit" id="create" onclick={this.handleSubmit}>
+                  Create Account
+                </Button>
+
+              </div>
             </form>
-            </CardContent>
+          </CardContent>
         </Card>
         <br></br><br></br><br></br><br></br><br></br>
-        </div>
-        // </BodyBackgroundColor>
-        
-        );
-    }
+      </div>
+      // </BodyBackgroundColor>
+
+    );
+  }
 }
 
 export default signup; 
