@@ -11,7 +11,6 @@ var app = express();
 // Import morgan package
 const logger = require('morgan');
 
-
 // Import CORS to send data to and from frontend
 const cors = require('cors');
 
@@ -229,6 +228,49 @@ app.post('/main',(req,resp)=>{
 	});
 	console.log(userInfo);
 });
+
+var jwt = require('jsonwebtoken');
+var supersecretkey = 'supersecretkey';
+app.get('/jwttesting', (req, res) => {
+	let token = jwt.sign({ foo: 'bar' }, supersecretkey);
+	console.log(`token: ${token}`);
+	res.json({ token: token }).status(200).end();
+});
+
+const verifyToken = (token) => {
+	try {
+		jwt.verify(token, supersecretkey);
+	} catch(err) {
+		return false;
+	} 
+	return true;
+}
+
+app.post('/signin', (req, res) => {
+	// attempt to find user with username and password, if found, sign token and send in response
+	let signinQuery = `select * from user where username = "${req.body.username}" and password = "${req.body.password}";`;
+	connection.query(signinQuery, true, (error, results, fields) => {
+		if (error) {
+			console.log(error);
+			res.status(500).end();
+			return;
+		}
+		if (results.length === 0) {
+			res.status(401).end();
+			return;
+		}
+		let token = jwt.sign({}, supersecretkey, { expiresIn: '1h' });
+		res.json({ token: token }).status(200).end();
+	});
+});
+
+app.post('/verifyTokenTest', (req, res) => {
+	console.log(verifyToken(req.body.token));
+	res.status(200).end();
+});
+
+
+
 
 
 // WEB SOCKET SECTION
