@@ -14,7 +14,8 @@ class Dashboard extends Component {
     this.state = {
       gameStart: false,
       username: '',
-      token: ''
+      token: '', 
+      isHost: true
     }
   }
 
@@ -34,6 +35,39 @@ class Dashboard extends Component {
     }
 
     console.log(this.context);
+
+    let requestObj = {
+      username, 
+      token
+    }
+
+    // get friends
+    fetch("http://ec2-18-222-189-77.us-east-2.compute.amazonaws.com:5000/get_friends", {
+      method: "POST", 
+      headers: {
+        "Content-Type": "application/json"
+      }, 
+      body: JSON.stringify(requestObj)
+    })
+    .then(res => {
+      if (res.status === 401) {
+        window.alert("logged out");
+        this.props.history.push('/login');
+        return null;
+      } else if (res.status === 500) {
+        window.alert("server error");
+        return null;
+      } else {
+        return res.json();
+      }
+    })
+    .then(res => {
+      if (res === null) {
+        return;
+      } else {
+        console.log(res);
+      }
+    });
   }
 
   render() {
