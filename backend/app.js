@@ -129,6 +129,7 @@ app.post('/signup', (req, res) => {
 });
 
 
+
 // Creates user and inserts user record to database
 app.post('/create_user', function(req,res) {
 
@@ -304,11 +305,19 @@ app.post('/verifyTokenTest', (req, res) => {
 });
 
 
-
+app.post('/get_friends', (req, res) => {
+	console.log(req.body);
+	//res.status(500).end();
+	if (!verifyToken(req.body.token)) {
+		res.status(409).end();
+		return;
+	}
+	// make the query for friends here
+	res.status(500).end();
+});
 
 
 // WEB SOCKET SECTION
-
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 
