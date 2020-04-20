@@ -64,6 +64,7 @@ class login extends React.Component {
         return;
       }
       localStorage.setItem("__pixelsmash__token", res.token);
+      localStorage.setItem("__pixelsmash__username", requestObject.username);
       this.props.history.push("/dashboard");
     });
   }
@@ -78,6 +79,7 @@ class login extends React.Component {
         <img src='https://www.freelogodesign.org/file/app/client/thumb/bf970f3b-3d14-44fc-b851-5b99674b0139_200x200.png?1581994698035' width="150" height="100" alt='Logo' />
         <Card className="card">
           <CardContent>
+            <h1>Login</h1>
             <form onSubmit={this.handleSubmit} className="form">
               <div id="textfields">
                 <TextField

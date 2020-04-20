@@ -17,6 +17,7 @@ class signup extends React.Component {
       password: '',
       confirmPassword: ''
     }
+
   }
 
   handleUsernameChange = (event) => {
@@ -40,12 +41,22 @@ class signup extends React.Component {
     })
   }
 
+  navigateToLogin = () => {
+    console.log('clicked');
+    this.props.history.push('/login');
+  }
+
   handleSubmit = (event) => {
     event.preventDefault()
     if (this.state.password !== this.state.confirmPassword) {
       window.alert("passwords don't match");
       return;
     }
+    if (!this.state.username || !this.state.password || !this.state.email) {
+      window.alert("no empty fields please");
+    }
+
+    console.log(this.state);
 
     let requestObject = {
       username: this.state.username, 
@@ -53,12 +64,14 @@ class signup extends React.Component {
       email: this.state.email
     }
 
-    fetch("http://ec2-18-222-189-77.us-east-2.compute.amazonaws.com:5000/create_user", {
+    console.log(requestObject);
+
+    fetch("http://ec2-18-222-189-77.us-east-2.compute.amazonaws.com:5000/signup", {
       method: "POST", 
-      data: JSON.stringify(requestObject), 
       headers: {
         "Content-Type": "application/json"
-      }
+      }, 
+      body: JSON.stringify(requestObject)
     })
     .then(res => {
       console.log(res.status);
@@ -85,6 +98,7 @@ class signup extends React.Component {
         <img src='https://www.freelogodesign.org/file/app/client/thumb/bf970f3b-3d14-44fc-b851-5b99674b0139_200x200.png?1581994698035' width="150" height="100" alt='Logo' />
         <Card className="card">
           <CardContent>
+            <h1>Sign Up</h1>
             <form onSubmit={this.handleSubmit}>
               <div id="textfields">
                 <TextField
@@ -137,7 +151,7 @@ class signup extends React.Component {
                 <br></br>
               </div>
               <div className="buttons">
-                <Button variant="contained" id="back">
+                <Button variant="contained" id="back" onClick={this.navigateToLogin}>
                   Back
                 </Button>
                 <Button variant="contained" type="submit" id="create" onclick={this.handleSubmit}>
