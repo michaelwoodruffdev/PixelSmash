@@ -101,6 +101,14 @@ app.get('/user_info', function(req,res) {
 //const { v4: uuidv4 } = require('uuid');
 
 app.post('/signup', (req, res) => {
+	console.log(req.body);
+	let requestObj = {
+		nextUserId, 
+		username: req.body.username, 
+		password: req.body.password, 
+		email: req.body.email
+	};
+	console.log(requestObj);
 	let signupQuery = `insert into user values ("${nextUserId++}", "${req.body.username}", "${req.body.username}", "${req.body.username}", "${req.body.email}", "${req.body.password}");`;
 
 	connection.query(signupQuery, function(err, result) {
