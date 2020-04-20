@@ -61,8 +61,8 @@ export default {
         y: 500
     },
     jumpHeights: {
-        first: -900,
-        second: -600
+        first: -550,
+        second: -400
     },
     mass: 200, 
     scale: .2

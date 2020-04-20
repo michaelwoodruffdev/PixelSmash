@@ -1,13 +1,13 @@
 class Fighter {
 
-    constructor(characterObject) {
+    constructor(characterObject, username) {
         // members
 
         this.sprite = null;
         this.isFalling = true;
         this.isWalking = false;
         this.config = characterObject;
-        this.config.fighterKey += 'sampleusername';
+        this.config.fighterKey += username;
 
         this.isLeftOrRightDown = false;
 
@@ -49,19 +49,29 @@ class Fighter {
         return this.sprite;
     }
 
-    land() {
+    land(context, playerKey, lobbyNo) {
         this.isMidair = false;
         this.isFalling = false;
         this.jumpCount = 0;
         this.velocityX = 0;
         this.sprite.anims.play(this.config.fighterKey + 'idle');
+        if (this.config.fighterKey === playerKey) {
+            context.emit('syncFighter',
+                {
+                    fighterKey: playerKey,
+                    x: this.sprite.x,
+                    y: this.sprite.y
+                },
+                lobbyNo
+            );
+        }
     }
 
-    addPlatformCollisions(passablePlatforms, impassablePlatforms) {
+    addPlatformCollisions(passablePlatforms, impassablePlatforms, context, playerKey, lobbyNo) {
         this.passableCollision = this.scene.physics.add.collider(this.sprite, passablePlatforms, () => {
             if (this.sprite.body.onFloor() === true) {
                 if (this.isMidair) {
-                    this.land();
+                    this.land(context, playerKey, lobbyNo);
                 }
             }
         },
@@ -76,7 +86,7 @@ class Fighter {
         this.impassableCollision = this.scene.physics.add.collider(this.sprite, impassablePlatforms, (player, platform) => {
             if (this.sprite.body.onFloor() === true) {
                 if (this.isMidair) {
-                    this.land();
+                    this.land(context, playerKey, lobbyNo);
                 }
             }
         });
@@ -95,7 +105,7 @@ class Fighter {
         if (this.leftKey.isDown) {
             this.isLeftOrRightDown = true;
             socketContext.emit('leftPress', this.config.fighterKey, lobbyNo);
-        } 
+        }
         else if (this.rightKey.isDown) {
             this.isLeftOrRightDown = true;
             socketContext.emit('rightPress', this.config.fighterKey, lobbyNo);
@@ -115,16 +125,13 @@ class Fighter {
     }
 
     tryToJump() {
-        console.log(this.jumpCount);
         // first jump
         if (this.jumpCount === 0) {
-            console.log('firstJump');
             this.sprite.setVelocityY(this.config.jumpHeights.first);
             this.sprite.anims.play(this.config.fighterKey + 'firstjump');
         }
         // double jump
         else if (this.jumpCount === 1) {
-            console.log('secondJump');
             this.sprite.setVelocityY(this.config.jumpHeights.second);
             this.sprite.anims.play(this.config.fighterKey + 'secondjump');
         }
