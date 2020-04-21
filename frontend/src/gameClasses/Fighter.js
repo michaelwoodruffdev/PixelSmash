@@ -103,6 +103,7 @@ class Fighter {
     // handle input
     handleInput(socketContext, lobbyNo) {
         if (this.leftKey.isDown) {
+            console.log('hello left key');
             this.isLeftOrRightDown = true;
             socketContext.emit('leftPress', this.config.fighterKey, lobbyNo);
         }

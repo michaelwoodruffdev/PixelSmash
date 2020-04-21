@@ -7,6 +7,7 @@ import { troomp, dhonu, billnbob } from '../../characterObjects/characters.js';
 import teststage from '../../stageConfigs/teststage.js';
 import defaultControls from '../../controlConfigs/default.js';
 import wasdControls from '../../controlConfigs/wasd.js';
+import { Event } from 'react-socket-io';
 
 class Dashboard extends Component {
   constructor(props) {
@@ -15,8 +16,15 @@ class Dashboard extends Component {
       gameStart: false,
       username: '',
       token: '', 
-      isHost: true
+      isHost: true, 
+      guest: '', 
+      lobbyNo: null
     }
+
+    this.onGetUserInfo = this.onGetUserInfo.bind(this);
+    this.onInvitationHeard = this.onInvitationHeard.bind(this);
+    this.onInviteFriendHeard = this.onInviteFriendHeard.bind(this);
+    this.onStartGameHeard = this.onStartGameHeard.bind(this);
   }
 
   // check login
@@ -33,45 +41,38 @@ class Dashboard extends Component {
         token
       });
     }
+  }
 
-    console.log(this.context);
+  onGetUserInfo() {
+    this.context.emit("getUserInfoHeard", this.state.username);
+  }
 
-    let requestObj = {
-      username, 
-      token
+  onInviteFriendHeard(success) {
+    if (success) {
+      window.alert("invite sent");
+    } else {
+      window.alert("invite failed (other user offline)");
     }
+  }
 
-    // get friends
-    fetch("http://ec2-18-222-189-77.us-east-2.compute.amazonaws.com:5000/get_friends", {
-      method: "POST", 
-      headers: {
-        "Content-Type": "application/json"
-      }, 
-      body: JSON.stringify(requestObj)
-    })
-    .then(res => {
-      if (res.status === 401) {
-        window.alert("logged out");
-        this.props.history.push('/login');
-        return null;
-      } else if (res.status === 500) {
-        window.alert("server error");
-        return null;
-      } else {
-        return res.json();
-      }
-    })
-    .then(res => {
-      if (res === null) {
-        return;
-      } else {
-        console.log(res);
-      }
+  onInvitationHeard(sender) {
+    let answer = window.confirm(`${sender} invited you to a game`);
+    if (answer) {
+      this.context.emit("acceptInvite", sender);
+    }
+  }
+
+  onStartGameHeard(lobbyNo) {
+    this.setState({
+      lobbyNo: lobbyNo
     });
+    this.setState({
+      gameStart: true
+    })
   }
 
   render() {
-    var { gameStart, username, token } = this.state;
+    var { gameStart, username, token, lobbyNo } = this.state;
 
     return (
       <div className="Dashboard">
@@ -79,16 +80,20 @@ class Dashboard extends Component {
         <div className="main-row">
           <div className="left-side">
             {!gameStart &&
-              <Lobby loggedInUser={username} loggedInToken={token} />
+              <Lobby loggedInUser={username} loggedInToken={token} socketContext={this.context}/>
             }
             {gameStart &&
-              <Game playerConfigs={[billnbob, dhonu]} stageConfig={teststage} controlConfigs={[wasdControls, defaultControls]} socketContext={this.context} />
+              <Game playerConfigs={[billnbob, dhonu]} stageConfig={teststage} controlConfigs={[wasdControls, defaultControls]} socketContext={this.context} lobbyNo={lobbyNo}/>
             }
           </div>
           <div className="right-side">
-            <Sidebar />
+            <Sidebar socketContext={this.context}/>
           </div>
         </div>
+        <Event event="getUserInfo" handler={this.onGetUserInfo} />
+        <Event event="inviteFriendHeard" handler={this.onInviteFriendHeard} />
+        <Event event="invitationHeard" handler={this.onInvitationHeard} />
+        <Event event="startGameHeard" handler={this.onStartGameHeard} />
       </div>
     );
   }
