@@ -25,7 +25,7 @@ h1 {
     background-color: grey;
 }
 
-button {
+.start-button {
     padding: .5rem;
     border: 0;
     margin-top: 2rem;
@@ -37,7 +37,7 @@ button {
     bottom: 1rem;
 }
 
-button:hover {
+.start-button:hover {
     cursor: pointer;
     background-color: #25a525;
 }

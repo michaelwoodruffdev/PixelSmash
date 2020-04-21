@@ -19,7 +19,7 @@ class Lobby extends Component {
                     {this.state.joinedUser}
                 </div>
 
-                <button>Start Game</button>
+                <button className="start-button">Start Game</button>
             </div>
         );
     }
