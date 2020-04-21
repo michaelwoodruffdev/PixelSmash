@@ -88,11 +88,16 @@ class Sidebar extends Component {
         })
     }
 
+    inviteFriend(friend) {
+        console.log('trying to invite ' + friend);
+        this.props.socketContext.emit('inviteFriend', friend);
+    }
+
     render() {
         var { friends } = this.state;
 
         var friendElements = friends.map(friend => {
-            return <div className="friend" key={friend}>{friend}</div>
+            return <div className="friend" key={friend} onClick={() => this.inviteFriend(friend)}>{friend}</div>
         });
 
         return (

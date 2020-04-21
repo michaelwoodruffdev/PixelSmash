@@ -10,7 +10,7 @@ export default class Game extends React.Component {
     constructor(props) {
         // manage props
         super(props);
-        let { playerConfigs, stageConfig, controlConfigs } = props;
+        let { playerConfigs, stageConfig, controlConfigs, lobbyNo } = props;
 
         // bind 'this' keyword to functions
         this.onConnected = this.onConnected.bind(this);
@@ -31,11 +31,14 @@ export default class Game extends React.Component {
             unmounted: false,
             initialize: false,
             game: null,
-            playerKey: 'billnbobsampleusername'
+            playerKey: 'billnbobsampleusername', 
+            lobbyNo: lobbyNo
         }
     }
 
     componentDidMount() {
+        console.log('game mounted');
+
         // initialization
         let { playerConfigs, stageConfig, controlConfigs } = this.props;
         let context = this.props.socketContext;     // socket.io connection
@@ -125,6 +128,7 @@ export default class Game extends React.Component {
                             fighterMapp[key].addPlatformCollisions(this.passablePlatforms, this.impassablePlatforms, context, this.component.state.playerKey, this.component.state.lobbyNo);
                             i++;
                         });
+                        console.log('adding controls to ' + this.component.state.playerKey);
                         fighterMapp[this.component.state.playerKey].addControls(controlConfigs[0]);
 
                         this.physics.world.setFPS(30);
