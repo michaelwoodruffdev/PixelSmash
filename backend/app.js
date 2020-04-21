@@ -356,32 +356,97 @@ var io = require('socket.io')(http);
 
 var lobbyNo = 1;
 var lobbies = {};
+var gameLobbies = {};
+var nextGameLobbyNo = 1;
+var loggedInUsers = {};
 
 io.on('connection', function(socket) {
+
+	// track logged in user
+	socket.emit('getUserInfo');
+	socket.on('getUserInfoHeard', function(username) {
+		socket.username = username;
+		loggedInUsers[username] = socket;
+	});
+
+	// friend invites and lobby creation
+	socket.on('inviteFriend', function(friendToInvite) {
+		if (!loggedInUsers.hasOwnProperty(friendToInvite)) {
+			socket.emit('inviteFriendHeard', false);
+		} else {
+			loggedInUsers[friendToInvite].emit('invitationHeard', socket.username);
+			socket.emit('inviteFriendHeard', true);
+		}
+	});
+
+	socket.on('acceptInvite', function(inviteSender) {
+		gameLobbies[inviteSender] = {
+			started: false, 
+			host: inviteSender, 
+			guest: socket.username
+		};
+		loggedInUsers[inviteSender].emit('guestJoined', socket.username);
+		socket.emit('joinHost', inviteSender);
+	});
+
+	socket.on('startGame', function() {
+		let gameLobby = gameLobbies[socket.username];
+		let hostSocket = loggedInUsers[gameLobby.host];
+		let guestSocket = loggedInUsers[gameLobby.guest];
+
+		gameLobby.started = true;
+		
+		hostSocket.join(`lobby-${lobbyNo}`);
+		guestSocket.join(`lobby-${lobbyNo}`);
+		
+		lobbies[`lobby-${lobbyNo}`] = {
+			gameStarted: true, 
+			playerCount: 2
+		}
+
+		hostSocket.emit('connectHeard');
+		guestSocket.emit('connectHeard');
+		hostSocket.emit('startGameHeard', lobbyNo);
+		guestSocket.emit('startGameHeard', lobbyNo);
+		hostSocket.lobbyNo = lobbyNo;
+		guestSocket.lobbyNo = lobbyNo;
+		hostSocket.emit('hostConnectHeard');
+		hostSocket.emit('gameStart');
+		guestSocket.emit('gameStart');
+
+		
+		lobbyNo++;
+	});
+
+		
+
+
+
 
 	// join / create lobby 
 	
 	// increment lobby number (create new lobby) if needed
-	if (io.nsps['/'].adapter.rooms["lobby-"+lobbyNo] && io.nsps['/'].adapter.rooms["lobby-"+lobbyNo].length > 1) lobbyNo++;
+	//if (io.nsps['/'].adapter.rooms["lobby-"+lobbyNo] && io.nsps['/'].adapter.rooms["lobby-"+lobbyNo].length > 1) lobbyNo++;
 	// join lobby
-	socket.join(`lobby-${lobbyNo}`);
-	socket.lobbyNo = lobbyNo;
-	io.in(`lobby-${lobbyNo}`).emit('connectHeard', lobbyNo);
-	if (!lobbies.hasOwnProperty(`lobby-${lobbyNo}`)) {
-		lobbies[`lobby-${lobbyNo}`] = {
-			gameStarted: false, 
-			playerCount: 1
-		};
-		socket.emit('hostConnectHeard');
-	} else {
-		io.in(`lobby-${lobbyNo}`).emit('gameStart');
-		lobbies[`lobby-${lobbyNo}`].playerCount++;
-		lobbies[`lobby-${lobbyNo}`].gameStarted = true;
-	}
-	console.log('a user connected to lobby ' + lobbyNo);
+	//socket.join(`lobby-${lobbyNo}`);
+	//socket.lobbyNo = lobbyNo;
+	//io.in(`lobby-${lobbyNo}`).emit('connectHeard', lobbyNo);
+	//if (!lobbies.hasOwnProperty(`lobby-${lobbyNo}`)) {
+	//	lobbies[`lobby-${lobbyNo}`] = {
+	//		gameStarted: false, 
+	//		playerCount: 1
+	//	};
+	//	socket.emit('hostConnectHeard');
+	//} else {
+	//	io.in(`lobby-${lobbyNo}`).emit('gameStart');
+	//	lobbies[`lobby-${lobbyNo}`].playerCount++;
+	//	lobbies[`lobby-${lobbyNo}`].gameStarted = true;
+	//}
+	//console.log('a user connected to lobby ' + lobbyNo);
 
 	// input listening
 	socket.on('leftPress', function(fighterkey, lobby) {
+		console.log(`${fighterkey} is trying to move left in lobby ${lobby}`);
 		io.in(`lobby-${lobby}`).emit('leftHeard', fighterkey);
 	});
 
@@ -418,13 +483,15 @@ io.on('connection', function(socket) {
 
 	// clean up lobbies on disconnection
 	socket.on('disconnect', function() {
-		console.log(`a user disconnected from lobby-${socket.lobbyNo}`);
-		lobbies[`lobby-${socket.lobbyNo}`].playerCount--;
-		if (lobbies[`lobby-${socket.lobbyNo}`].playerCount == 1) {
-			io.in(`lobby-${lobbyNo}`).emit('playerDisconnect');
-		} else if (lobbies[`lobby-${socket.lobbyNo}`].playerCount === 0) {
-			delete lobbies[`lobby-${socket.lobbyNo}`];
-		}
+		delete loggedInUsers[socket.username];
+
+		//console.log(`a user disconnected from lobby-${socket.lobbyNo}`);
+		//lobbies[`lobby-${socketa.lobbyNo}`].playerCount--;
+		//if (lobbies[`lobby-${socket.lobbyNo}`].playerCount == 1) {
+		//	io.in(`lobby-${lobbyNo}`).emit('playerDisconnect');
+		//} else if (lobbies[`lobby-${socket.lobbyNo}`].playerCount === 0) {
+		//	delete lobbies[`lobby-${socket.lobbyNo}`];
+		//}
 	});
 });
 
