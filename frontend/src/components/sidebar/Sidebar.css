@@ -1,0 +1,50 @@
+.Sidebar {
+    background-color: rgba(61, 14, 54, 0.884);
+    height: 670px;
+}
+
+.friend {
+    width: 100%;
+    background-color: #a5a5a5;
+    padding: .6rem 0;
+    transition: background-color .3s ease;
+    border-bottom: darkgrey;
+}
+
+.friend:hover {
+    cursor: pointer;
+    background-color: grey;
+}
+
+h2 {
+    margin: 0;
+    background-color: white;
+    padding: 1rem 0;
+}
+
+.input-row {
+    background-color: white;
+    padding: .3rem 0;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.input-row > input {
+    border: 1px solid grey;
+    padding: .3rem;
+    border-radius: .2rem;
+    width: 60%;
+}
+
+.input-row > button {
+    width: 35%;
+    background-color: white;
+    border: 1px solid grey;
+    border-radius: .2rem;
+    transition: background-color .3s ease;
+}
+
+.input-row > button:hover {
+    cursor: pointer;
+    background-color: lightgrey;
+}

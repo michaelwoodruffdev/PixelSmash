@@ -1,0 +1,43 @@
+.Lobby {
+    width: 80%;
+    margin: auto;
+    height: 674px;
+    position: relative;
+    background-color: rgba(61, 14, 54, 0.884)
+}
+
+h1 {
+    color: white !important;
+}
+
+.user {
+    width: 300px;
+    background-color: #a5a5a5;
+    padding: 1rem;
+    border-bottom: 1px solid grey;
+    margin: auto;
+    transition: background-color .5s ease;
+    font-size: 1.4rem;
+}
+
+.user:hover {
+    cursor: pointer;
+    background-color: grey;
+}
+
+.start-button {
+    padding: .5rem;
+    border: 0;
+    margin-top: 2rem;
+    background-color: #45b545;
+    transition: background-color .5s ease;
+    font-size: 1.2rem;
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+}
+
+.start-button:hover {
+    cursor: pointer;
+    background-color: #25a525;
+}

@@ -10,7 +10,7 @@ export default class Game extends React.Component {
     constructor(props) {
         // manage props
         super(props);
-        let { playerConfigs, stageConfig, controlConfigs } = props;
+        let { playerConfigs, stageConfig, controlConfigs, lobbyNo } = props;
 
         // bind 'this' keyword to functions
         this.onConnected = this.onConnected.bind(this);
@@ -31,14 +31,17 @@ export default class Game extends React.Component {
             unmounted: false,
             initialize: false,
             game: null,
-            playerKey: 'billnbobsampleusername'
+            playerKey: 'billnbobsampleusername', 
+            lobbyNo: lobbyNo
         }
     }
 
     componentDidMount() {
+        console.log('game mounted');
+
         // initialization
         let { playerConfigs, stageConfig, controlConfigs } = this.props;
-        let context = this.context;     // socket.io connection
+        let context = this.props.socketContext;     // socket.io connection
 
         // store fighters in state
         let fightersToStoreInState = {};
@@ -125,6 +128,7 @@ export default class Game extends React.Component {
                             fighterMapp[key].addPlatformCollisions(this.passablePlatforms, this.impassablePlatforms, context, this.component.state.playerKey, this.component.state.lobbyNo);
                             i++;
                         });
+                        console.log('adding controls to ' + this.component.state.playerKey);
                         fighterMapp[this.component.state.playerKey].addControls(controlConfigs[0]);
 
                         this.physics.world.setFPS(30);
@@ -253,7 +257,7 @@ export default class Game extends React.Component {
     }
 
     onPlayerDisconnect() {
-        this.context.emit('manualDisconnect');
+        this.props.context.emit('manualDisconnect');
     }
 
     onSyncFighters(updateObj) {
@@ -294,6 +298,10 @@ export default class Game extends React.Component {
             <div className="Game">
                 {/* <button onClick={this.initializeGame}>start</button> */}
                 {/* <button onClick={this.uninitializeGame}>stop</button> */}
+
+                {!initialize && 
+                    <p>Waiting for socket connection</p>
+                }
 
                 {<IonPhaser game={game} initialize={initialize} />}
                 <Event event="leftHeard" handler={this.onLeftHeard} />
