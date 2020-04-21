@@ -196,17 +196,64 @@ app.get('/', function (req, res) {
 })
 
 
+const verifyToken = (token) => {
+	try {
+		jwt.verify(token, supersecretkey);
+	} catch(err) {
+		return false;
+	} 
+	return true;
+}
 
-app.post('/main',(req,resp)=>{
+app.post('/add_friend', (req, res) => {
+	//if (!verifyToken(req.body.token)) {
+	//	res.status(409).end();
+	//	return;
+	//}
+
+	let getFriendToAddIdSQL = `select iduser from user where username = "${req.body.friendToAdd}";`;
+	let getOwnIdSQL = `select iduser from user where username = "${req.body.username}";`;
+
+	connection.query(getFriendToAddIdSQL, true, (error, friendResults, fields) => {
+		console.log(friendResults);
+		if (friendResults.length === 0) {
+			console.log('hello?');
+			res.status(404).end();
+			return;
+		} else {
+			connection.query(getOwnIdSQL, true, (error2, ownResults, fields) => {
+				if (ownResults.length === 0) {
+					res.status(404).end();
+					return;
+				} else {
+					let friendToAddId = friendResults[0].iduser;
+					let ownId = ownResults[0].iduser;
+					let insertFriendSQL = `insert into friend values (${ownId}, ${friendToAddId});`;
+					connection.query(insertFriendSQL, (err, result) => {
+						if (err) {
+							res.status(500).end();
+							return;
+						} else {
+							res.status(200).end();
+							return;
+						}
+					});
+				}
+			});
+		}
+	});		
+});
+
+app.post('/get_friends',(req,resp)=>{
 	// This secret variable will store the tokenized version of the object
 	var secret = "";
 
 	// This is the code that encrypts the user's information
 	secret = crypto.Rabbit.encrypt(JSON.stringify(req.body), 'secret key 123').toString();
 
-	console.log("Encrypted info :",secret);
+	//console.log("Encrypted info :",secret);
 	var payload = JSON.parse(crypto.enc.Utf8.stringify(crypto.Rabbit.decrypt(secret, 'secret key 123')));
-	console.log("Decrypted info: ",payload);
+	//console.log("Decrypted info: ",payload);
 
 	var username = payload.username;
 
@@ -219,7 +266,14 @@ app.post('/main',(req,resp)=>{
 	connection.query(sql,true,(error,results,fields) => {
 		if(error)
 		{
-			console.error(error.message);
+			resp.status(500).end();
+			return;
+			//console.error(error.message);
+		}
+		console.log(results);
+		if (results[0].length === 0) {
+			resp.status(404).end();
+			return;
 		}
 
 		// The previous stored procedure will only return 
@@ -231,7 +285,7 @@ app.post('/main',(req,resp)=>{
 				// This console.log statement prints the id pertaining to the user with the
 				// given username
 				id = result.iduser;
-				console.log(`User id for `+username+` is `+id);
+				//console.log(`User id for `+username+` is `+id);
 
 				// Now we are getting the friends of this user using the 
 				// user's id and calling the stored procedure
@@ -241,17 +295,16 @@ app.post('/main',(req,resp)=>{
 //				console.log("The friends of "+username+" are");
 				connection.query(sql2,true,(err,res,param)=>{
 					
-					if(err)console.error(err.message);
-					
+					if(err) {
+						resp.status(404).end();
+						return;
+						console.error(err.message);
+					}
 					res[0].forEach((i) =>
 						{
 							userInfo.friends.push(i.username);
 					//		console.log(userInfo);
 						});
-					io.sockets.on('connection',function(socket){
-						console.log(socket.connected);
-						console.log(username+" has connected.");
-					});
 				
 					return resp.send(userInfo);
 				});
@@ -260,7 +313,7 @@ app.post('/main',(req,resp)=>{
 					
 			});
 	});
-	console.log(userInfo);
+	//console.log(userInfo);
 });
 
 var jwt = require('jsonwebtoken');
@@ -271,14 +324,6 @@ app.get('/jwttesting', (req, res) => {
 	res.json({ token: token }).status(200).end();
 });
 
-const verifyToken = (token) => {
-	try {
-		jwt.verify(token, supersecretkey);
-	} catch(err) {
-		return false;
-	} 
-	return true;
-}
 
 app.post('/signin', (req, res) => {
 	// attempt to find user with username and password, if found, sign token and send in response
@@ -302,18 +347,6 @@ app.post('/signin', (req, res) => {
 app.post('/verifyTokenTest', (req, res) => {
 	console.log(verifyToken(req.body.token));
 	res.status(200).end();
-});
-
-
-app.post('/get_friends', (req, res) => {
-	console.log(req.body);
-	//res.status(500).end();
-	if (!verifyToken(req.body.token)) {
-		res.status(409).end();
-		return;
-	}
-	// make the query for friends here
-	res.status(500).end();
 });
 
 
