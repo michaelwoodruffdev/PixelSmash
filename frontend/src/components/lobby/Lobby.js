@@ -2,62 +2,59 @@ import React, { Component } from 'react';
 import './Lobby.css';
 import { Event } from 'react-socket-io';
 
+
 class Lobby extends Component {
+
     constructor(props) {
         super(props);
-        let host = this.props.loggedInUser;
-        this.state = {
-            host: localStorage.getItem("__pixelsmash__username"), 
-            guest: "empty slot",
-            isHost: true
-        }
 
-        this.onGuestJoined = this.onGuestJoined.bind(this);
-        this.onJoinHost = this.onJoinHost.bind(this);
+        this.characterRef = React.createRef();
+
         this.startGame = this.startGame.bind(this);
-    }
+        this.onGetFighterKey = this.onGetFighterKey.bind(this);
 
-    onGuestJoined(guest) {
-        this.setState({
-            guest: guest, 
-            isHost: true
-        });
     }
+    
 
-    onJoinHost(host) {
-        this.setState({
-            guest: this.props.loggedInUser, 
-            isHost: false, 
-            host: host
-        });
-    }
+    
 
     startGame() {
-        if (!this.state.isHost) {
+        if (!this.props.isHost) {
             window.alert("you are not the host");
-        } else if (this.state.guest === "empty slot") {
+        } else if (this.props.guest === "empty slot") {
             window.alert("waiting for opponent to join");
         } else {
             this.props.socketContext.emit("startGame");
         }
     }
 
+    onGetFighterKey() {
+        let fighter = this.characterRef.current.value;
+        let fighterKey = this.characterRef.current.value;
+        fighterKey += (this.props.isHost ? this.props.host : this.props.guest);
+        console.log(fighterKey);
+        this.props.socketContext.emit("getFighterKeyHeard", fighterKey, fighter);
+    }
+
     render() {
-        var { host, guest }  = this.state;
+        var { host, guest }  = this.props;
 
         return (
             <div className="Lobby">
-                <h1>Lobby</h1>
+                <h1 className="title">Lobby</h1>
                 <div className="user">
                     {host}
                 </div>
                 <div className="user">
                     {guest}
                 </div>
-
+                
+                <select className="character" ref={this.characterRef}>
+                    <option value="dhonu">Dhonu</option>
+                    <option value="billnbob">BillnBob</option>
+                </select>  
                 <button className="start-button" onClick={this.startGame}>Start Game</button>
-                <Event event="guestJoined" handler={this.onGuestJoined} />
-                <Event event="joinHost" handler={this.onJoinHost} />
+                <Event event="getFighterKey" handler={this.onGetFighterKey} />
             </div>
         );
     }

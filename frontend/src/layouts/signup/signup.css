@@ -18,11 +18,14 @@
     /*86fde8 the blue color*/
 }
 
-h1 {
+.snup_title {
     font-size: 3rem;
     margin: 0;
     color: #441B5F;
     margin-bottom: 2rem;
+    font-family: 'Francois One', sans-serif;
+
+
 }
 
 #names{
@@ -54,9 +57,7 @@ form{
 /* .body{
     background-color: aqua;
 } */
-.container{
-    width: 100vw;
-    height: 100vh;
+.container_signup{
     background-color: #441B5F;
     /* position: fixed; */
     /* display: flex; */
@@ -81,10 +82,15 @@ img{
     display: flex;
     justify-content: space-evenly;
     margin-top: 1rem;
+
 }
 
 .buttons > * {
     width: 40% !important;
     background-color: #441B5F !important;
     color: #6AC8C7 !important;
+    font-family: 'Righteous', cursive !important;
+    
 }
+
+/* font-family: 'Righteous', cursive; */

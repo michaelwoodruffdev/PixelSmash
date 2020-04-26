@@ -40,14 +40,13 @@ export default class Game extends React.Component {
         console.log('game mounted');
 
         // initialization
-        let { playerConfigs, stageConfig, controlConfigs } = this.props;
+        let { playerConfigs, stageConfig, controlConfigs, hostFighterKey, guestFighterKey, host, guest } = this.props;
         let context = this.props.socketContext;     // socket.io connection
 
         // store fighters in state
         let fightersToStoreInState = {};
-        playerConfigs.forEach(pConf => {
-            fightersToStoreInState[`${pConf.fighterKey}sampleusername`] = new Fighter(pConf, 'sampleusername');
-        });
+        fightersToStoreInState[`${hostFighterKey}`] = new Fighter(playerConfigs[0], host);
+        fightersToStoreInState[`${guestFighterKey}`] = new Fighter(playerConfigs[1], guest);
         this.setState({
             fighterMap: fightersToStoreInState,
             isHost: false,
@@ -125,11 +124,11 @@ export default class Game extends React.Component {
                         Object.keys(fighterMapp).forEach((key) => {
                             fighterMapp[key].addSprite(stageConfig.spawnLocations[i].x, stageConfig.spawnLocations[i].y);
                             fighterMapp[key].loadAnimations();
-                            fighterMapp[key].addPlatformCollisions(this.passablePlatforms, this.impassablePlatforms, context, this.component.state.playerKey, this.component.state.lobbyNo);
+                            fighterMapp[key].addPlatformCollisions(this.passablePlatforms, this.impassablePlatforms, context, this.component.props.playerKey, this.component.props.lobbyNo);
                             i++;
                         });
-                        console.log('adding controls to ' + this.component.state.playerKey);
-                        fighterMapp[this.component.state.playerKey].addControls(controlConfigs[0]);
+                        console.log('adding controls to ' + this.component.props.playerKey);
+                        fighterMapp[this.component.props.playerKey].addControls(controlConfigs[0]);
 
                         this.physics.world.setFPS(30);
                         this.cameras.cameras[0].fadeIn(1000);
@@ -143,20 +142,20 @@ export default class Game extends React.Component {
 
                         if (this.framesPassed === 30) {
                             this.framesPassed = 0;
-                            if (this.component.state.fighterMap[this.component.state.playerKey].sprite.body.onFloor()) {
+                            if (this.component.state.fighterMap[this.component.props.playerKey].sprite.body.onFloor()) {
                                 context.emit('syncFighter',
                                     {
-                                        fighterKey: this.component.state.playerKey,
-                                        x: fighterMap[this.component.state.playerKey].sprite.x,
-                                        y: fighterMap[this.component.state.playerKey].sprite.y
+                                        fighterKey: this.component.props.playerKey,
+                                        x: fighterMap[this.component.props.playerKey].sprite.x,
+                                        y: fighterMap[this.component.props.playerKey].sprite.y
                                     },
-                                    this.component.state.lobbyNo
+                                    this.component.props.lobbyNo
                                 );
                             }
                         }
 
                         // handle fighters input and current animation state
-                        fighterMap[this.component.state.playerKey].handleInput(context, this.component.state.lobbyNo);
+                        fighterMap[this.component.props.playerKey].handleInput(context, this.component.props.lobbyNo);
                         Object.keys(fighterMap).forEach(key => {
                             fighterMap[key].handleWalk(context);
                             fighterMap[key].checkMovementState();
@@ -168,7 +167,10 @@ export default class Game extends React.Component {
                     }
                 }
             }
-        })
+        });
+        this.setState({
+            initialize: true
+        });
     }
 
     componentWillUnmount() {
@@ -191,7 +193,6 @@ export default class Game extends React.Component {
                 extremes.minX = currentFighterSprite.x;
             }
             if (currentFighterSprite.x > extremes.maxX) {
-                // camera.setZoom(desiredZoom);  
                 extremes.maxX = currentFighterSprite.x;
             }
             if (currentFighterSprite.y < extremes.minY) {
@@ -220,6 +221,7 @@ export default class Game extends React.Component {
     }
 
     onLeftHeard(fighterKey) {
+        console.log(fighterKey);
         this.state.fighterMap[fighterKey].moveLeft();
     }
 
@@ -268,9 +270,8 @@ export default class Game extends React.Component {
     }
 
     onSyncFighterHeard(position, fighterKey) {
-        // console.log(Math.abs(this.state.fighterMap[fighterKey].sprite.x - position.x));
-        // console.log(Math.abs(this.state.fighterMap[fighterKey].sprite.y - position.y));
-
+        console.log(fighterKey);
+        console.log(this.state.fighterMap);
         if (Math.abs(this.state.fighterMap[fighterKey].sprite.x - position.x) > 50 || Math.abs(this.state.fighterMap[fighterKey].sprite.y - position.y) > 50) {
             console.log('should resync');
             this.state.fighterMap[fighterKey].sprite.setX(position.x);
@@ -280,7 +281,6 @@ export default class Game extends React.Component {
 
     onLatencyPong() {
         this.setState({ latency: Date.now() - this.state.latencyPingTimer });
-        // console.log(this.state.latency);
     }
 
     initializeGame = () => {
@@ -296,9 +296,6 @@ export default class Game extends React.Component {
         const { initialize, game } = this.state
         return (
             <div className="Game">
-                {/* <button onClick={this.initializeGame}>start</button> */}
-                {/* <button onClick={this.uninitializeGame}>stop</button> */}
-
                 {!initialize && 
                     <p>Waiting for socket connection</p>
                 }

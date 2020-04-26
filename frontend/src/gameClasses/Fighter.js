@@ -6,7 +6,7 @@ class Fighter {
         this.sprite = null;
         this.isFalling = true;
         this.isWalking = false;
-        this.config = characterObject;
+        this.config = Object.assign({}, characterObject);
         this.config.fighterKey += username;
 
         this.isLeftOrRightDown = false;
