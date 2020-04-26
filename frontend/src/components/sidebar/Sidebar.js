@@ -105,7 +105,7 @@ class Sidebar extends Component {
                 <h2>Friends</h2>
                 <div className="input-row">
                     <input type="text" placeholder="add friend..." ref={this.addFriendRef}></input>
-                    <button onClick={this.addFriend}>add</button>
+                    <button className="add" onClick={this.addFriend}>Add</button>
                 </div>
                 <div className="friends-list">
                     {friendElements}

@@ -1,3 +1,4 @@
+
 .Lobby {
     width: 80%;
     margin: auto;
@@ -6,18 +7,24 @@
     background-color: rgba(61, 14, 54, 0.884)
 }
 
-h1 {
-    color: white !important;
+.title {
+    /*color: white !important;*/
+   color:rgb(91, 243, 240) !important;   /*6AC8C7*/
+   font-family: 'Bangers', cursive;
+   padding-top: 10px;
 }
 
 .user {
     width: 300px;
-    background-color: #a5a5a5;
+    /* background-color: #a5a5a5; */
+    background-color: rgb(91, 243, 240);
+    color: rgba(61, 14, 54, 0.884);
     padding: 1rem;
     border-bottom: 1px solid grey;
     margin: auto;
     transition: background-color .5s ease;
     font-size: 1.4rem;
+    font-family: 'Righteous', cursive;
 }
 
 .user:hover {
@@ -29,15 +36,25 @@ h1 {
     padding: .5rem;
     border: 0;
     margin-top: 2rem;
-    background-color: #45b545;
+    background-color: rgb(91, 243, 240)  /*#45b545*/;
     transition: background-color .5s ease;
     font-size: 1.2rem;
     position: absolute;
     right: 1rem;
     bottom: 1rem;
+    font-family: 'Righteous', cursive;
 }
 
 .start-button:hover {
     cursor: pointer;
     background-color: #25a525;
+}
+
+.character{
+    width: 333px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    background-color: rgb(211, 210, 210);
+    font-family: 'Righteous', cursive;
+    font-size: large;
 }
