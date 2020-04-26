@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import './Lobby.css';
 import { Event } from 'react-socket-io';
 
+
 class Lobby extends Component {
+
     constructor(props) {
         super(props);
 
@@ -10,7 +12,11 @@ class Lobby extends Component {
 
         this.startGame = this.startGame.bind(this);
         this.onGetFighterKey = this.onGetFighterKey.bind(this);
+
     }
+    
+
+    
 
     startGame() {
         if (!this.props.isHost) {
@@ -35,19 +41,18 @@ class Lobby extends Component {
 
         return (
             <div className="Lobby">
-                <h1>Lobby</h1>
+                <h1 className="title">Lobby</h1>
                 <div className="user">
                     {host}
                 </div>
                 <div className="user">
                     {guest}
                 </div>
-
-                <select id="character" ref={this.characterRef}>
+                
+                <select className="character" ref={this.characterRef}>
                     <option value="dhonu">Dhonu</option>
                     <option value="billnbob">BillnBob</option>
-                </select>
-
+                </select>  
                 <button className="start-button" onClick={this.startGame}>Start Game</button>
                 <Event event="getFighterKey" handler={this.onGetFighterKey} />
             </div>

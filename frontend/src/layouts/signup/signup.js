@@ -4,7 +4,6 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import axios from 'axios';
 //import Infobar from '../toolbar/Toolbar';
 // import logo from './logo.png';
 
@@ -93,12 +92,12 @@ class signup extends React.Component {
   render() {
     return (
       // <BodyBackgroundColor backgroundColor = '#FF00F'>
-      <div className="container">
+      <div className="container_signup">
         {/* <Infobar/> */}
         <img src='https://www.freelogodesign.org/file/app/client/thumb/bf970f3b-3d14-44fc-b851-5b99674b0139_200x200.png?1581994698035' width="150" height="100" alt='Logo' />
         <Card className="card">
           <CardContent>
-            <h1>Sign Up</h1>
+            <h1 className="snup_title">Sign Up</h1>
             <form onSubmit={this.handleSubmit}>
               <div id="textfields">
                 <TextField
@@ -162,7 +161,7 @@ class signup extends React.Component {
             </form>
           </CardContent>
         </Card>
-        <br></br><br></br><br></br><br></br><br></br>
+        <br></br><br></br><br></br>
       </div>
       // </BodyBackgroundColor>
 

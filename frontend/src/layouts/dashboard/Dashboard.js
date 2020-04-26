@@ -9,6 +9,8 @@ import defaultControls from '../../controlConfigs/default.js';
 import wasdControls from '../../controlConfigs/wasd.js';
 import { Event } from 'react-socket-io';
 
+
+
 class Dashboard extends Component {
   constructor(props) {
     super(props);
@@ -127,7 +129,8 @@ class Dashboard extends Component {
 
     return (
       <div className="Dashboard">
-        <div className="header-placeholder">PixelSmash</div>
+        {/*<div className="header-placeholder">PixelSmash</div>*/}
+        <img src='https://www.freelogodesign.org/file/app/client/thumb/bf970f3b-3d14-44fc-b851-5b99674b0139_200x200.png?1581994698035' width="150" height="100" alt='Logo' />
         <div className="main-row">
           <div className="left-side">
             {!gameStart &&
