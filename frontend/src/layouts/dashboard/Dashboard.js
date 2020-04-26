@@ -8,7 +8,7 @@ import teststage from '../../stageConfigs/teststage.js';
 import defaultControls from '../../controlConfigs/default.js';
 import wasdControls from '../../controlConfigs/wasd.js';
 import { Event } from 'react-socket-io';
-
+import Infobar from '../toolbar/Toolbar';
 
 
 class Dashboard extends Component {
@@ -129,8 +129,10 @@ class Dashboard extends Component {
 
     return (
       <div className="Dashboard">
+        <Infobar></Infobar>
+        <br></br><br></br>
         {/*<div className="header-placeholder">PixelSmash</div>*/}
-        <img src='https://www.freelogodesign.org/file/app/client/thumb/bf970f3b-3d14-44fc-b851-5b99674b0139_200x200.png?1581994698035' width="150" height="100" alt='Logo' />
+        {/* <img src='https://www.freelogodesign.org/file/app/client/thumb/bf970f3b-3d14-44fc-b851-5b99674b0139_200x200.png?1581994698035' width="150" height="100" alt='Logo' /> */}
         <div className="main-row">
           <div className="left-side">
             {!gameStart &&

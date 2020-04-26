@@ -5,9 +5,13 @@ AppBar{
 #bar{
     /* background-color: #12555E; */
     background-color: rgb(142, 129, 189);
-    /* rgb(64, 96, 137) */
 }
-
 #title{
     color: #441B5F;
+}
+
+.image{
+    width: 115px;
+    height: 65px;
+    display: flex;
 }
