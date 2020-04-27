@@ -1,30 +1,31 @@
 export default {
     assets: {
-        background: 'assets/background.png', 
-        ground: 'assets/ground.png'
+        background: 'assets/Background_sprite_1.png', 
+        ground: 'assets/solid-stage-cropped.png', 
+        passablePlatform: 'assets/fallthrough.png'
     }, 
     passablePlatforms: [
         {
             x: 100, 
-            y: 350, 
-            scale: 1.2
+            y: 250, 
+            scale: .35
         }, 
         {
             x: 1100, 
-            y: 350, 
-            scale: 1.2
+            y: 250, 
+            scale: .35
         }, 
         {
             x: 600, 
-            y: 300, 
-            scale: 1.2
+            y: 200, 
+            scale: .35
         }
     ], 
     impassablePlatforms: [
         {
             x: 600, 
-            y: 450, 
-            scale: 1.3
+            y: 550, 
+            scale: .6
         }
     ],
     spawnLocations: [

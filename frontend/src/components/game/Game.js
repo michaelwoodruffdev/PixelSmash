@@ -98,6 +98,7 @@ export default class Game extends React.Component {
                         // load stage assets
                         this.load.image('background', stageConfig.assets.background);
                         this.load.image('ground', stageConfig.assets.ground);
+                        this.load.image('passable', stageConfig.assets.passablePlatform);
                     },
                     create: function () {
                         // timers
@@ -105,12 +106,12 @@ export default class Game extends React.Component {
                         this.framesPassed = 0;
 
                         // background
-                        this.background = this.add.image(600, 337.5, 'background').setScale(2);
+                        this.background = this.add.image(600, 337.5, 'background').setScale(.23);
 
                         // platforms
                         this.passablePlatforms = this.physics.add.staticGroup();
                         stageConfig.passablePlatforms.forEach(platform => {
-                            this.passablePlatforms.create(platform.x, platform.y, 'ground').setScale(platform.scale).refreshBody();
+                            this.passablePlatforms.create(platform.x, platform.y, 'passable').setScale(platform.scale).refreshBody();
                         });
                         this.impassablePlatforms = this.physics.add.staticGroup();
                         stageConfig.impassablePlatforms.forEach(platform => {
