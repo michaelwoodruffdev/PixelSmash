@@ -312,6 +312,42 @@ export default class Game extends React.Component {
                 <Event event="syncFighters" handler={this.onSyncFighters} />
                 <Event event="syncFighterHeard" handler={this.onSyncFighterHeard} />
                 <Event event="latencyPong" handler={this.onLatencyPong} />
+            
+            <table id = "playerTable">
+                <tr id = "playernames">
+                    <th>player1 name with image</th> 
+                    
+                    <th>player2 name with image</th>
+                </tr>
+                <tr id = "playerDeathCount">
+                    <th>Lives:</th>
+                    
+                    <th>Lives:</th>
+                </tr>
+                <tr id = "playerDamage">
+                    <th>Damage: 0%</th>
+                    
+                    <th>Damage: 0%</th>
+                </tr>
+            </table>
+            
+            <button className="start-button" onClick={this.startGame}>Start Game</button>
+                <Event event="getFighterKey" handler={this.onGetFighterKey} />
+            
+                <div id="audioControls">
+            
+                <audio id="lobbyAudio">
+                <source src="../../assets/lobby.mp3" type="audio/mpeg" loop = "infinite" muted = "muted"/>
+                Your browser does not support the audio element.
+                </audio>
+            
+                <button onclick="playAudio('lobbyAudio')" type="button">Music On</button>
+                <button onclick="pauseAudio('lobbyAudio)" type="button">Music Off</button> 
+                <script>
+                
+        
+                </script>
+                </div>
             </div>
         );
     }
