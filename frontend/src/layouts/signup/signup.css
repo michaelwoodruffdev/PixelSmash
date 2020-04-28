@@ -1,21 +1,16 @@
 .card{
     margin: auto;
-    margin-top: 5px;
+    margin-top: 20px;
     width: 600px;
     height: auto !important;
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    /*background: #076585;  /*fallback for old browsers*/
-    /*background: -webkit-linear-gradient(to right, #fff, #076585);  /*Chrome 10-25, Safari 5.1-6*/
-    /*background: linear-gradient(to right, #fff, #076585); /*W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+
-    /* background-color: #6AC8C7; */
     background: #acb6e5;  /* fallback for old browsers */
     background: -webkit-linear-gradient(to right, #e6d5f3, #acb6e5);  /* Chrome 10-25, Safari 5.1-6 */
     background: linear-gradient(to right, #e6d5f3, #acb6e5); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     padding: 1rem;
-    /*86fde8 the blue color*/
 }
 
 .snup_title {
@@ -73,10 +68,10 @@ form{
     border-color: blueviolet;
 }
 
-img{
+/* img{
     margin-right: 1200px;
     margin-top: 5px;
-}
+} */
 
 .buttons {
     display: flex;
