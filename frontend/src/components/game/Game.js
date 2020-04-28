@@ -331,7 +331,6 @@ export default class Game extends React.Component {
                 </tr>
             </table>
             
-            <button className="start-button" onClick={this.startGame}>Start Game</button>
                 <Event event="getFighterKey" handler={this.onGetFighterKey} />
             
                 <div id="audioControls">
