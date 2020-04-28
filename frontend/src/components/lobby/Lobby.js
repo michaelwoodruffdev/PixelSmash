@@ -51,6 +51,9 @@ class Lobby extends Component {
                 
                 <select className="character" ref={this.characterRef}>
                     <option value="dhonu">Dhonu</option>
+                    <option value="dhonu_dark">Dhonu (dark)</option>
+                    <option value="dhonu_pink">Dhonu (pink)</option>
+                    <option value="dhonu_gold">Dhonu (gold)</option>
                     <option value="billnbob">BillnBob</option>
                 </select>
 		{isHost &&
