@@ -25,12 +25,12 @@ export default {
             frameRate: 7,
             repeat: 0
         }, 
-        // {
-        //     key: 'aerial-attack',
-        //     frames: { start: 12,end: 15},
-        //     frameRate: 10,
-        //     repeat: 0
-        // },
+        {
+            key: 'aerial-attack',
+            frames: { start: 12,end: 15},
+            frameRate: 10,
+            repeat: -1
+        },
         {
             key: 'secondjump',
             frames: { start: 16, end: 21 },
@@ -67,18 +67,18 @@ export default {
             frameRate: 6,
             repeat: -1
         },
-        // {
-        //     key:'jab',
-        //     frames:{start:39,end:44},
-        //     framerate: 10,
-        //     repeat: -1
-        // },
         {
-            key:'side-tilt',
-            frames:{start:45,end: 48},
-            framerate: 10,
+            key:'jab',
+            frames: { start:39, end:44 },
+            frameRate: 10,
             repeat: -1
         }
+        // {
+        //     key:'side-tilt',
+        //     frames:{start:45,end: 48},
+        //     framerate: 10,
+        //     repeat: -1
+        // }
     ],
     fighterKey: 'dhonu', 
     movementSpeed: 400,
@@ -91,8 +91,8 @@ export default {
         y: 500
     },
     jumpHeights: {
-        first: -550,
-        second: -400
+        first: -600,
+        second: -600
     },
     mass: 200, 
     scale: .2

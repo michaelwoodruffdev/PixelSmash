@@ -4,6 +4,7 @@ export default {
         left: "A", 
         right: "D", 
         down: "S", 
-        jump: "W"
+        jump: "W", 
+        baseAttack: "J"
     }
 }
