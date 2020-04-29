@@ -293,6 +293,7 @@ export default class Game extends React.Component {
     }
 
     render() {
+        var { host, guest }  = this.props;
         const { initialize, game } = this.state
         return (
             <div className="Game">
@@ -312,6 +313,38 @@ export default class Game extends React.Component {
                 <Event event="syncFighters" handler={this.onSyncFighters} />
                 <Event event="syncFighterHeard" handler={this.onSyncFighterHeard} />
                 <Event event="latencyPong" handler={this.onLatencyPong} />
+                <table id = "playerTable">
+                <tr id = "playernames">
+                    <th>{host}</th> 
+                    
+                    <th>{guest}</th>
+                </tr>
+                <tr id = "playerDeathCount">
+                    <th>Lives:</th>
+                    
+                    <th>Lives:</th>
+                </tr>
+                <tr id = "playerDamage">
+                    <th>Damage: 0%</th>
+                    
+                    <th>Damage: 0%</th>
+                </tr>
+            </table>
+            
+                <div id="audioControls">
+            
+                <audio id="lobbyAudio">
+                <source src="../../assets/lobby.mp3" type="audio/mpeg" loop = "infinite" muted = "muted"/>
+                Your browser does not support the audio element.
+                </audio>
+            
+                <button onclick="playAudio('lobbyAudio')" type="button">Music On</button>
+                <button onclick="pauseAudio('lobbyAudio)" type="button">Music Off</button> 
+                <script>
+                
+        
+                </script>
+                </div>
             </div>
         );
     }

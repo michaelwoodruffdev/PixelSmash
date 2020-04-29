@@ -38,7 +38,7 @@ class Lobby extends Component {
 
     render() {
         var { host, guest }  = this.props;
-
+        
         return (
             <div className="Lobby">
                 <h1 className="title">Lobby</h1>
