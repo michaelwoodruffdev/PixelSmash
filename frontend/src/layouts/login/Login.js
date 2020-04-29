@@ -5,6 +5,8 @@ import Button from '@material-ui/core/Button';
 import axios from 'axios';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
+import Infobar from '../toolbar/Toolbar';
+
 
 
 class login extends React.Component {
@@ -76,7 +78,9 @@ class login extends React.Component {
   render() {
     return (
       <div className="container">                            {/*in react you can only return one element, that's why you need to wrap the code in one div */}
-        <img src='https://www.freelogodesign.org/file/app/client/thumb/bf970f3b-3d14-44fc-b851-5b99674b0139_200x200.png?1581994698035' width="150" height="100" alt='Logo' />
+        <Infobar></Infobar>
+        <br></br><br></br> <br></br><br></br>
+        {/* <img src='https://www.freelogodesign.org/file/app/client/thumb/bf970f3b-3d14-44fc-b851-5b99674b0139_200x200.png?1581994698035' width="150" height="100" alt='Logo' /> */}
         <Card className="card">
           <CardContent>
             <h1 className="lgin_title">Login</h1>
@@ -115,25 +119,6 @@ class login extends React.Component {
                   Signup
                   </Button>
               </div>
-
-              {/*This is the old method without Material UI*/}
-              {/*I temporarly need this part PLEASE DON"T DELETE!!  */}
-
-              {/* <label>Username:</label>
-                  <input 
-                    type="text" 
-                    value={this.state.username} 
-                    onChange={this.handleUsernameChange} 
-                  /> */}
-
-              {/* <label>Password:</label>
-                  <input
-                    type="text"
-                    value={this.state.password}
-                    onChange={this.handlePasswordChange}
-                  /> */}
-              {/* <button type="submit">Login</button>
-                  <button type="submit">Signup</button> */}
 
             </form>
           </CardContent>

@@ -313,11 +313,13 @@ export default class Game extends React.Component {
                 <Event event="syncFighters" handler={this.onSyncFighters} />
                 <Event event="syncFighterHeard" handler={this.onSyncFighterHeard} />
                 <Event event="latencyPong" handler={this.onLatencyPong} />
+
                 <table id = "playerTable">
                 <tr id = "playernames">
                     <th>{host}</th> 
                     
                     <th>{guest}</th>
+
                 </tr>
                 <tr id = "playerDeathCount">
                     <th>Lives:</th>
@@ -330,6 +332,8 @@ export default class Game extends React.Component {
                     <th>Damage: 0%</th>
                 </tr>
             </table>
+            
+                <Event event="getFighterKey" handler={this.onGetFighterKey} />
             
                 <div id="audioControls">
             
