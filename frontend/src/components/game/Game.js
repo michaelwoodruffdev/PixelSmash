@@ -302,6 +302,7 @@ export default class Game extends React.Component {
     }
 
     render() {
+        var { host, guest }  = this.props;
         const { initialize, game } = this.state
         return (
             <div className="Game">
@@ -322,17 +323,18 @@ export default class Game extends React.Component {
                 <Event event="syncFighterHeard" handler={this.onSyncFighterHeard} />
                 <Event event="latencyPong" handler={this.onLatencyPong} />
                 <Event event="baseAttackPressHeard" handler={this.onBaseAttackPressHeard} />
-            
-            <table id = "playerTable">
+          
+                <table id = "playerTable">
                 <tr id = "playernames">
-                    <th>player1 name with image</th> 
+                    <th>{host}</th> 
                     
-                    <th>player2 name with image</th>
+                    <th>{guest}</th>
+
                 </tr>
                 <tr id = "playerDeathCount">
-                    <th>Lives:</th>
+                    <th>Lives: 3</th>
                     
-                    <th>Lives:</th>
+                    <th>Lives: 3</th>
                 </tr>
                 <tr id = "playerDamage">
                     <th>Damage: 0%</th>
@@ -340,8 +342,7 @@ export default class Game extends React.Component {
                     <th>Damage: 0%</th>
                 </tr>
             </table>
-            
-                {/* <Event event="getFighterKey" handler={this.onGetFighterKey} /> */}
+          
             
                 <div id="audioControls">
             
