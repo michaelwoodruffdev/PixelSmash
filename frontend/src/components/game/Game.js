@@ -25,6 +25,7 @@ export default class Game extends React.Component {
         this.onSyncFighters = this.onSyncFighters.bind(this);
         this.onSyncFighterHeard = this.onSyncFighterHeard.bind(this);
         this.onLatencyPong = this.onLatencyPong.bind(this);
+        this.onBaseAttackPressHeard = this.onBaseAttackPressHeard.bind(this);
 
         // root state initialization
         this.state = {
@@ -244,6 +245,13 @@ export default class Game extends React.Component {
         this.state.fighterMap[fighterKey].tryToJump();
     }
 
+    onBaseAttackPressHeard(fighterKey) {
+        if (this.state == null) {
+            return;
+        }
+        this.state.fighterMap[fighterKey].baseAttack();
+    }
+
     onConnectHeard(lobbyNo) {
         this.setState({ lobbyNo: lobbyNo });
     }
@@ -313,6 +321,7 @@ export default class Game extends React.Component {
                 <Event event="syncFighters" handler={this.onSyncFighters} />
                 <Event event="syncFighterHeard" handler={this.onSyncFighterHeard} />
                 <Event event="latencyPong" handler={this.onLatencyPong} />
+                <Event event="baseAttackPressHeard" handler={this.onBaseAttackPressHeard} />
             
             <table id = "playerTable">
                 <tr id = "playernames">
@@ -332,7 +341,7 @@ export default class Game extends React.Component {
                 </tr>
             </table>
             
-                <Event event="getFighterKey" handler={this.onGetFighterKey} />
+                {/* <Event event="getFighterKey" handler={this.onGetFighterKey} /> */}
             
                 <div id="audioControls">
             
