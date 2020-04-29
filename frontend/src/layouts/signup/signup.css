@@ -54,6 +54,7 @@ form{
 } */
 .container_signup{
     background-color: #441B5F;
+    height: 100vh !important;
     /* position: fixed; */
     /* display: flex; */
     /* justify-content: center;
