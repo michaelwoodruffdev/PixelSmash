@@ -3,8 +3,8 @@ import './Dashboard.css';
 import Game from '../../components/game/Game.js';
 import Sidebar from '../../components/sidebar/Sidebar.js';
 import Lobby from '../../components/lobby/Lobby.js';
-import { troomp, dhonu, billnbob } from '../../characterObjects/characters.js';
-import teststage from '../../stageConfigs/teststage.js';
+import { troomp, dhonu, billnbob, dhonu_dark, dhonu_pink, dhonu_gold } from '../../characterObjects/characters.js';
+import teststage from '../../stageConfigs/himalopolis.js';
 import defaultControls from '../../controlConfigs/default.js';
 import wasdControls from '../../controlConfigs/wasd.js';
 import { Event } from 'react-socket-io';
@@ -52,6 +52,9 @@ class Dashboard extends Component {
     let characterMap = this.state.characterMap;
     characterMap['dhonu'] = dhonu;
     characterMap['billnbob'] = billnbob;
+    characterMap['dhonu_dark'] = dhonu_dark;
+    characterMap['dhonu_pink'] = dhonu_pink;
+    characterMap['dhonu_gold'] = dhonu_gold;
     this.setState({
       characterMap: characterMap
     });

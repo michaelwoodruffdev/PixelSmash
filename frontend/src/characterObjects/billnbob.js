@@ -36,6 +36,18 @@ export default {
             frames: { start: 9, end: 15 },
             frameRate: 15,
             repeat: -1
+        }, 
+        {
+            key: 'jab', 
+            frames: { start: 9, end: 15}, 
+            frameRate: 20, 
+            repeat: 0
+        }, 
+        {
+            key: 'aerial-attack', 
+            frames: { start: 9, end: 15 }, 
+            frameRate: 20, 
+            repeat: 0
         }
     ], 
     fighterKey: 'billnbob', 

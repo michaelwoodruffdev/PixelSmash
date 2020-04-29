@@ -459,6 +459,10 @@ io.on('connection', function(socket) {
 		io.in(`lobby-${lobby}`).emit('upHeard', fighterkey);
 	});
 
+	socket.on('baseAttackPress', function(fighterkey, lobby) {
+		io.in(`lobby-${lobby}`).emit('baseAttackPressHeard', fighterkey);
+	});
+
 	// triggered by player1 if player2 leaves and visa-verca
 	socket.on('manualDisconnect', function() {
 		socket.disconnect();

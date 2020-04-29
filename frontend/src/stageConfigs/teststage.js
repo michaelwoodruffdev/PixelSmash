@@ -6,18 +6,18 @@ export default {
     passablePlatforms: [
         {
             x: 100, 
-            y: 250, 
-            scale: .2
+            y: 350, 
+            scale: 1.2
         }, 
         {
             x: 1100, 
-            y: 250, 
-            scale: .2
+            y: 350, 
+            scale: 1.2
         }, 
         {
             x: 600, 
-            y: 200, 
-            scale: .3
+            y: 300, 
+            scale: 1.2
         }
     ], 
     impassablePlatforms: [

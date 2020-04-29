@@ -25,6 +25,7 @@ export default class Game extends React.Component {
         this.onSyncFighters = this.onSyncFighters.bind(this);
         this.onSyncFighterHeard = this.onSyncFighterHeard.bind(this);
         this.onLatencyPong = this.onLatencyPong.bind(this);
+        this.onBaseAttackPressHeard = this.onBaseAttackPressHeard.bind(this);
 
         // root state initialization
         this.state = {
@@ -98,6 +99,7 @@ export default class Game extends React.Component {
                         // load stage assets
                         this.load.image('background', stageConfig.assets.background);
                         this.load.image('ground', stageConfig.assets.ground);
+                        this.load.image('passable', stageConfig.assets.passablePlatform);
                     },
                     create: function () {
                         // timers
@@ -105,12 +107,12 @@ export default class Game extends React.Component {
                         this.framesPassed = 0;
 
                         // background
-                        this.background = this.add.image(600, 337.5, 'background').setScale(2);
+                        this.background = this.add.image(600, 337.5, 'background').setScale(.23);
 
                         // platforms
                         this.passablePlatforms = this.physics.add.staticGroup();
                         stageConfig.passablePlatforms.forEach(platform => {
-                            this.passablePlatforms.create(platform.x, platform.y, 'ground').setScale(platform.scale).refreshBody();
+                            this.passablePlatforms.create(platform.x, platform.y, 'passable').setScale(platform.scale).refreshBody();
                         });
                         this.impassablePlatforms = this.physics.add.staticGroup();
                         stageConfig.impassablePlatforms.forEach(platform => {
@@ -243,6 +245,13 @@ export default class Game extends React.Component {
         this.state.fighterMap[fighterKey].tryToJump();
     }
 
+    onBaseAttackPressHeard(fighterKey) {
+        if (this.state == null) {
+            return;
+        }
+        this.state.fighterMap[fighterKey].baseAttack();
+    }
+
     onConnectHeard(lobbyNo) {
         this.setState({ lobbyNo: lobbyNo });
     }
@@ -313,7 +322,8 @@ export default class Game extends React.Component {
                 <Event event="syncFighters" handler={this.onSyncFighters} />
                 <Event event="syncFighterHeard" handler={this.onSyncFighterHeard} />
                 <Event event="latencyPong" handler={this.onLatencyPong} />
-
+                <Event event="baseAttackPressHeard" handler={this.onBaseAttackPressHeard} />
+          
                 <table id = "playerTable">
                 <tr id = "playernames">
                     <th>{host}</th> 
@@ -322,9 +332,9 @@ export default class Game extends React.Component {
 
                 </tr>
                 <tr id = "playerDeathCount">
-                    <th>Lives:</th>
+                    <th>Lives: 3</th>
                     
-                    <th>Lives:</th>
+                    <th>Lives: 3</th>
                 </tr>
                 <tr id = "playerDamage">
                     <th>Damage: 0%</th>
@@ -332,8 +342,7 @@ export default class Game extends React.Component {
                     <th>Damage: 0%</th>
                 </tr>
             </table>
-            
-                <Event event="getFighterKey" handler={this.onGetFighterKey} />
+          
             
                 <div id="audioControls">
             

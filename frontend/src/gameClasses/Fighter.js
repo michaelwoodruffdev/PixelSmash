@@ -37,6 +37,10 @@ class Fighter {
                 repeat: animation.repeat
             });
         });
+        // console.log(this.scene.anims);
+        // this.scene.anims.anims.entries[`${this.config.fighterKey}jab`].chain(`${this.config.fighterKey}idle`);
+        // console.log(this.scene.anims.anims);
+
     }
 
     // adding sprite and collisions
@@ -98,12 +102,14 @@ class Fighter {
         this.downKey = this.scene.input.keyboard.addKey(controls.keys.down);
         this.leftKey = this.scene.input.keyboard.addKey(controls.keys.left);
         this.rightKey = this.scene.input.keyboard.addKey(controls.keys.right);
+        this.baseAttackKey = this.scene.input.keyboard.addKey(controls.keys.baseAttack);
+        this.baseAttackKey.isDownWithoutRelease = false;
     }
 
     // handle input
     handleInput(socketContext, lobbyNo) {
         if (this.leftKey.isDown) {
-            console.log('hello left key');
+            console.log('hello' + this.config.fighterKey);
             this.isLeftOrRightDown = true;
             socketContext.emit('leftPress', this.config.fighterKey, lobbyNo);
         }
@@ -122,6 +128,17 @@ class Fighter {
         }
         if (!this.upKey.isDown && this.isUpKeyDownWithoutRelease) {
             this.isUpKeyDownWithoutRelease = false;
+        }
+
+        if (this.baseAttackKey.isDown && !this.baseAttackKey.isDownWithoutRelease)
+        {
+            socketContext.emit('baseAttackPress', this.config.fighterKey, lobbyNo);
+            // console.log(`${this.config.fighterKey} should attack`);
+            this.baseAttackKey.isDownWithoutRelease = true;
+        }
+        if (!this.baseAttackKey.isDown && this.baseAttackKey.isDownWithoutRelease)
+        {
+            this.baseAttackKey.isDownWithoutRelease = false;
         }
     }
 
@@ -171,6 +188,16 @@ class Fighter {
         }
         if (this.sprite.body.onFloor()) {
             this.velocityX = 0;
+        }
+    }
+
+    baseAttack() {
+        console.log(this.config.fighterKey + " should attack");
+        // this.sprite.anims.chain([`${this.config.fighterKey}jab`, `${this.config.fighterKey}idle`]);
+        if (this.sprite.body.onFloor()) {
+            this.sprite.anims.play(this.config.fighterKey + 'jab');
+        } else {
+            this.sprite.anims.play(this.config.fighterKey + 'aerial-attack');
         }
     }
 

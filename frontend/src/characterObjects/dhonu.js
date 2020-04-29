@@ -1,15 +1,15 @@
 export default {
-    spritesheetPath: 'assets/dhonu2-3.png',
+    spritesheetPath: 'assets/Dhonu2-3-5.png',
     spriteSheetAnimations: [
         {
-            key: 'left',
-            frames: { start: 1, end: 5 },
+            key: 'right',
+            frames: { start: 0, end: 5 },
             frameRate: 10,
             repeat: -1
         },
         {
-            key: 'right',
-            frames: { start: 1, end: 5 },
+            key: 'left',
+            frames: { start: 0, end: 5 },
             frameRate: 10,
             repeat: -1
         },
@@ -22,47 +22,77 @@ export default {
         {
             key: 'falling',
             frames: { start: 8, end: 11 },
-            frameRate: 14,
+            frameRate: 7,
             repeat: 0
-        },
+        }, 
         {
-            key: 'secondjump',
-            frames: { start: 14, end: 17 },
-            frameRate: 15,
-            repeat: -1
-        },
-        {
-            key: 'landing-frame',
-            frames: { start: 18, end: 18 },
-            frameRate: 12,
-            repeat: -1
-        },
-        {
-            key: 'ledge-hang',
-            frames: { start: 19, end: 22 },
+            key: 'aerial-attack',
+            frames: { start: 12,end: 15},
             frameRate: 10,
             repeat: -1
         },
         {
-            key: 'idle',
-            frames: { start: 23, end: 26 },
-            frameRate: 5,
+            key: 'secondjump',
+            frames: { start: 16, end: 21 },
+            frameRate: 15,
+            repeat: -1
+        },
+        // {
+        //     key:'landing-frame',
+        //     frames: {start:22, end:22},
+        //     frameRate: 12,
+        //     repeat: -1
+        // },
+        // {
+        //     key:'ledge-hang',
+        //     frames: {start:23, end:26},
+        //     frameRate: 10,
+        //     repeat: -1
+        // },
+        // {
+        //     key:'ledge-getup-start',
+        //     frames: {start:27,end:30},
+        //     framerate: 10,
+        //     repeat: -1
+        // },
+        // {
+        //     key:'ledge-getup-attack',
+        //     frames:{start:31,end:34},
+        //     framerate: 10,
+        //     repeat: -1
+        // },
+        {
+            key:'idle',
+            frames: {start:35, end: 38},
+            frameRate: 6,
+            repeat: -1
+        },
+        {
+            key:'jab',
+            frames: { start:39, end:44 },
+            frameRate: 10,
             repeat: -1
         }
+        // {
+        //     key:'side-tilt',
+        //     frames:{start:45,end: 48},
+        //     framerate: 10,
+        //     repeat: -1
+        // }
     ],
     fighterKey: 'dhonu', 
     movementSpeed: 400,
     frameDimensions: {
-        frameWidth: 1280,
-        frameHeight: 1280
+        frameWidth: 2000,
+        frameHeight: 2000
     },
     hitboxDimensions: {
         x: 400,
         y: 500
     },
     jumpHeights: {
-        first: -550,
-        second: -400
+        first: -600,
+        second: -600
     },
     mass: 200, 
     scale: .2

@@ -37,8 +37,8 @@ class Lobby extends Component {
     }
 
     render() {
-        var { host, guest }  = this.props;
-        
+        var { host, guest, isHost }  = this.props;
+
         return (
             <div className="Lobby">
                 <h1 className="title">Lobby</h1>
@@ -51,9 +51,14 @@ class Lobby extends Component {
                 
                 <select className="character" ref={this.characterRef}>
                     <option value="dhonu">Dhonu</option>
+                    <option value="dhonu_dark">Dhonu (dark)</option>
+                    <option value="dhonu_pink">Dhonu (pink)</option>
+                    <option value="dhonu_gold">Dhonu (gold)</option>
                     <option value="billnbob">BillnBob</option>
-                </select>  
-                <button className="start-button" onClick={this.startGame}>Start Game</button>
+                </select>
+		{isHost &&
+        	<button className="start-button" onClick={this.startGame}>Start Game</button>
+		}
                 <Event event="getFighterKey" handler={this.onGetFighterKey} />
             </div>
         );
